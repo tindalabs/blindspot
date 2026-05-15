@@ -65,6 +65,18 @@ and privacy model.
 
 See [SDK_API.md](SDK_API.md) for the complete public API.
 
+## The Tindalabs stack
+
+Blindspot is one of three composable browser-layer packages:
+
+| Package | What it does |
+|---|---|
+| **[@tindalabs/blindspot](https://github.com/tindalabs/blindspot)** | Privacy-first OTel frontend observability |
+| **[@tindalabs/shield](https://github.com/tindalabs/shield)** | Tamper detection & active content protection |
+| **[@tindalabs/scent](https://github.com/tindalabs/scent)** | Probabilistic identity continuity |
+
+They compose naturally: Shield attaches `shield.*` attributes to Blindspot spans, and Scent reads those same attributes as risk signals via `observe({ extraSignals: shield.signals })`.
+
 ## Roadmap
 
 See [ROADMAP.md](ROADMAP.md) — React, Vue, and Next.js integrations are next.
