@@ -22,7 +22,7 @@ function renderHome() {
   return `
     <div class="card">
       <h2 style="margin-bottom:0.5rem">Welcome to the demo app</h2>
-      <p style="color:#6b7280;margin-bottom:1rem">Every click, navigation, form submission and fetch call below
+      <p style="color:#94a3b8;margin-bottom:1rem">Every click, navigation, form submission and fetch call below
       generates an OpenTelemetry span. Open <a href="http://localhost:3100" target="_blank">Grafana</a> to see them.</p>
       <div style="display:flex;gap:0.75rem;flex-wrap:wrap">
         <button class="btn-primary" id="btn-fetch">Fetch task data</button>
@@ -32,7 +32,7 @@ function renderHome() {
     </div>
     <div class="card">
       <h3 style="margin-bottom:0.75rem">Try navigating</h3>
-      <p style="color:#6b7280">Use the nav links above to move between pages. Each navigation creates a new root span in your trace.</p>
+      <p style="color:#94a3b8">Use the nav links above to move between pages. Each navigation creates a new root span in your trace.</p>
     </div>`;
 }
 
@@ -42,7 +42,7 @@ function renderTasks() {
       (t) =>
         `<div class="task-item">
           <input type="checkbox" data-task-id="${t.id}" ${t.done ? 'checked' : ''}/>
-          <span style="${t.done ? 'text-decoration:line-through;color:#9ca3af' : ''}">${t.text}</span>
+          <span style="${t.done ? 'text-decoration:line-through;color:#64748b' : ''}">${t.text}</span>
         </div>`,
     )
     .join('');
@@ -64,7 +64,7 @@ function renderAbout() {
   return `
     <div class="card">
       <h2 style="margin-bottom:0.5rem">About</h2>
-      <p style="color:#6b7280;line-height:1.6">
+      <p style="color:#94a3b8;line-height:1.6">
         This example app is instrumented with <strong>@tindalabs/blindspot</strong>.
         It records route navigations, user interactions, form submissions, fetch calls,
         and web vitals — all as OpenTelemetry spans, without capturing any personally

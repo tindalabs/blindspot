@@ -35,7 +35,7 @@ export default function Tasks() {
         {tasks.map((t) => (
           <div className="task-item" key={t.id}>
             <input type="checkbox" checked={t.done} onChange={() => toggle(t.id)} />
-            <span style={t.done ? { textDecoration: 'line-through', color: '#9ca3af' } : {}}>
+            <span style={t.done ? { textDecoration: 'line-through', color: '#64748b' } : {}}>
               {t.text}
             </span>
           </div>

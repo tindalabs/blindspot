@@ -16,21 +16,21 @@ export default function Nav() {
         <Link
           href="/"
           data-blindspot-label="nav-home"
-          style={isActive('/') ? { background: 'rgba(255,255,255,0.15)', color: 'white' } : {}}
+          style={isActive('/') ? { background: 'rgba(255,255,255,0.08)', color: 'white' } : {}}
         >
           Home
         </Link>
         <Link
           href="/tasks"
           data-blindspot-label="nav-tasks"
-          style={isActive('/tasks') ? { background: 'rgba(255,255,255,0.15)', color: 'white' } : {}}
+          style={isActive('/tasks') ? { background: 'rgba(255,255,255,0.08)', color: 'white' } : {}}
         >
           Tasks
         </Link>
         <Link
           href="/about"
           data-blindspot-label="nav-about"
-          style={isActive('/about') ? { background: 'rgba(255,255,255,0.15)', color: 'white' } : {}}
+          style={isActive('/about') ? { background: 'rgba(255,255,255,0.08)', color: 'white' } : {}}
         >
           About
         </Link>
