@@ -55,6 +55,10 @@ docker compose down
 |---|---|
 | [`@tindalabs/blindspot-core`](packages/core) | OTel provider, privacy engine, consent gate |
 | [`@tindalabs/blindspot`](packages/web) | Auto-instrumentation (routing, clicks, forms, fetch, vitals, errors) |
+| [`@tindalabs/blindspot-react`](packages/react) | React integration — `BlindspotProvider`, `BlindspotRoutes`, `useSpan` |
+| [`@tindalabs/blindspot-vue`](packages/vue) | Vue 3 integration — `BlindspotPlugin`, `useBlindspot` |
+| [`@tindalabs/blindspot-svelte`](packages/svelte) | Svelte / SvelteKit integration |
+| [`@tindalabs/blindspot-next`](packages/next) | Next.js integration — App Router + Pages Router |
 
 ## Architecture
 
