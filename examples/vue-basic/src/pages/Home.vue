@@ -33,7 +33,7 @@ function handleError() {
 <template>
   <div class="card">
     <h2 style="margin-bottom: 0.5rem">Welcome to the Vue demo app</h2>
-    <p style="color: #6b7280; margin-bottom: 1rem">
+    <p style="color: #94a3b8; margin-bottom: 1rem">
       Every click, navigation, form submission and fetch call below generates an
       OpenTelemetry span. Open
       <a href="http://localhost:3100" target="_blank" rel="noreferrer">Grafana</a> to see them.
@@ -51,7 +51,7 @@ function handleError() {
   </div>
   <div class="card">
     <h3 style="margin-bottom: 0.75rem">Try navigating</h3>
-    <p style="color: #6b7280">
+    <p style="color: #94a3b8">
       Use the nav links above to move between pages. Each navigation creates a new root
       span in your trace, instrumented by <code>installBlindspotRouter</code>.
     </p>

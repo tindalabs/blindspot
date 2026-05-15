@@ -25,7 +25,7 @@ function addTask() {
     <h2 style="margin-bottom: 1rem">Tasks</h2>
     <div v-for="task in tasks" :key="task.id" class="task-item">
       <input type="checkbox" :checked="task.done" @change="toggle(task.id)" />
-      <span :style="task.done ? 'text-decoration: line-through; color: #9ca3af' : ''">
+      <span :style="task.done ? 'text-decoration: line-through; color: #64748b' : ''">
         {{ task.text }}
       </span>
     </div>

@@ -1,7 +1,7 @@
 <template>
   <div class="card">
     <h2 style="margin-bottom: 0.5rem">About</h2>
-    <p style="color: #6b7280; line-height: 1.6">
+    <p style="color: #94a3b8; line-height: 1.6">
       This example app is instrumented with <strong>@tindalabs/blindspot-vue</strong>.
       It records route navigations via <code>installBlindspotRouter</code>, user interactions,
       form submissions, fetch calls, and web vitals — all as OpenTelemetry spans, without

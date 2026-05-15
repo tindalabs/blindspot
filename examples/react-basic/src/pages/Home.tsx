@@ -33,7 +33,7 @@ export default function Home() {
     <>
       <div className="card">
         <h2 style={{ marginBottom: '0.5rem' }}>Welcome to the React demo app</h2>
-        <p style={{ color: '#6b7280', marginBottom: '1rem' }}>
+        <p style={{ color: '#94a3b8', marginBottom: '1rem' }}>
           Every click, navigation, form submission and fetch call below generates an
           OpenTelemetry span. Open{' '}
           <a href="http://localhost:3100" target="_blank" rel="noreferrer">Grafana</a> to see them.
@@ -53,7 +53,7 @@ export default function Home() {
       </div>
       <div className="card">
         <h3 style={{ marginBottom: '0.75rem' }}>Try navigating</h3>
-        <p style={{ color: '#6b7280' }}>
+        <p style={{ color: '#94a3b8' }}>
           Use the nav links above to move between pages. Each navigation creates a new root
           span in your trace, instrumented by <code>&lt;BlindspotRoutes&gt;</code>.
         </p>

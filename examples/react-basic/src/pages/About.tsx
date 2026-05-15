@@ -3,7 +3,7 @@ export default function About() {
     <>
       <div className="card">
         <h2 style={{ marginBottom: '0.5rem' }}>About</h2>
-        <p style={{ color: '#6b7280', lineHeight: 1.6 }}>
+        <p style={{ color: '#94a3b8', lineHeight: 1.6 }}>
           This example app is instrumented with <strong>@tindalabs/blindspot-react</strong>.
           It records route navigations via <code>&lt;BlindspotRoutes&gt;</code>, user interactions,
           form submissions, fetch calls, and web vitals — all as OpenTelemetry spans, without
