@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": ".",
+    "noEmit": true,
+    "moduleResolution": "Node",
+    "types": ["node"]
+  },
+  "include": ["**/*.ts"]
+}

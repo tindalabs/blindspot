@@ -1,0 +1,215 @@
+{
+  "annotations": { "list": [] },
+  "description": "OpenTelemetry-native UX observability — privacy-first, developer-friendly. Every panel queries Tempo TraceQL directly; no PII is ever captured.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+
+    { "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 10, "title": "User Sessions", "type": "row" },
+
+    {
+      "datasource": { "type": "tempo", "uid": "tempo" },
+      "description": "All user sessions from the selected time range. Each row is one trace (page load → last interaction). Click any row to open the full waterfall — route spans, click spans, API calls, and web vitals. No PII is ever captured.",
+      "fieldConfig": {
+        "defaults": { "custom": { "filterable": true } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "nested" },
+            "properties": [ { "id": "custom.hidden", "value": true } ] }
+        ]
+      },
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 1 },
+      "id": 1,
+      "options": { "sortBy": [ { "displayName": "Start time", "desc": true } ] },
+      "targets": [
+        {
+          "datasource": { "type": "tempo", "uid": "tempo" },
+          "queryType": "traceql",
+          "query": "{}",
+          "refId": "A",
+          "limit": 20
+        }
+      ],
+      "title": "Recent UX Sessions",
+      "type": "table"
+    },
+
+    { "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 11 },
+      "id": 11, "title": "Interaction Quality", "type": "row" },
+
+    {
+      "datasource": { "type": "tempo", "uid": "tempo" },
+      "description": "Sessions containing rapid repeated clicks on the same target (≥ 3 clicks within 500 ms). A rage click means the user expected a response and didn't get one. Span attributes: ux.element.label, ux.element.tag, ux.element.role.",
+      "fieldConfig": {
+        "defaults": { "custom": { "filterable": true } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "nested" },
+            "properties": [ { "id": "custom.hidden", "value": true } ] }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "id": 2,
+      "options": { "sortBy": [ { "displayName": "Start time", "desc": true } ] },
+      "targets": [
+        {
+          "datasource": { "type": "tempo", "uid": "tempo" },
+          "queryType": "traceql",
+          "query": "{span.ux.rage_click=true}",
+          "refId": "A",
+          "limit": 50
+        }
+      ],
+      "title": "Rage Clicks — User Frustration",
+      "type": "table"
+    },
+
+    {
+      "datasource": { "type": "tempo", "uid": "tempo" },
+      "description": "Sessions where a user clicked a non-interactive element (div, span, p, img, etc.). Indicates a visual affordance problem — something looks clickable but isn't. Span attributes: ux.element.label, ux.element.tag.",
+      "fieldConfig": {
+        "defaults": { "custom": { "filterable": true } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "nested" },
+            "properties": [ { "id": "custom.hidden", "value": true } ] }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "id": 3,
+      "options": { "sortBy": [ { "displayName": "Start time", "desc": true } ] },
+      "targets": [
+        {
+          "datasource": { "type": "tempo", "uid": "tempo" },
+          "queryType": "traceql",
+          "query": "{span.ux.dead_click=true}",
+          "refId": "A",
+          "limit": 50
+        }
+      ],
+      "title": "Dead Clicks — Broken Affordances",
+      "type": "table"
+    },
+
+    { "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 20 },
+      "id": 12, "title": "Navigation & API", "type": "row" },
+
+    {
+      "datasource": { "type": "tempo", "uid": "tempo" },
+      "description": "Every route transition in the selected window. Span attributes: ux.route.from (previous path), ux.route.to (target path), ux.route.trigger (user / back-forward / initial). Use these to reconstruct user flows and identify exit points.",
+      "fieldConfig": {
+        "defaults": { "custom": { "filterable": true } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "nested" },
+            "properties": [ { "id": "custom.hidden", "value": true } ] }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 21 },
+      "id": 4,
+      "options": { "sortBy": [ { "displayName": "Start time", "desc": true } ] },
+      "targets": [
+        {
+          "datasource": { "type": "tempo", "uid": "tempo" },
+          "queryType": "traceql",
+          "query": "{span:name=~\"navigation.*\"}",
+          "refId": "A",
+          "limit": 50
+        }
+      ],
+      "title": "Navigation Patterns",
+      "type": "table"
+    },
+
+    {
+      "datasource": { "type": "tempo", "uid": "tempo" },
+      "description": "All outbound fetch calls with user-perceived latency. Span attributes: ux.api.user_wait_ms (ms from last interaction to response), ux.api.triggered_by (label of the element that caused the call), http.status_code. The W3C traceparent header is injected automatically for backend correlation.",
+      "fieldConfig": {
+        "defaults": { "custom": { "filterable": true } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "nested" },
+            "properties": [ { "id": "custom.hidden", "value": true } ] }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 21 },
+      "id": 5,
+      "options": { "sortBy": [ { "displayName": "Duration", "desc": true } ] },
+      "targets": [
+        {
+          "datasource": { "type": "tempo", "uid": "tempo" },
+          "queryType": "traceql",
+          "query": "{span.ux.api.user_wait_ms > 0}",
+          "refId": "A",
+          "limit": 50
+        }
+      ],
+      "title": "API Calls — User-Perceived Latency",
+      "type": "table"
+    },
+
+    { "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 29 },
+      "id": 13, "title": "Reliability", "type": "row" },
+
+    {
+      "datasource": { "type": "tempo", "uid": "tempo" },
+      "description": "Every form submit event. Span attributes: ux.form.name (form id/name), ux.form.valid (browser validation state at submit time), ux.form.attempts (total submits for this form instance). Field values are never captured.",
+      "fieldConfig": {
+        "defaults": { "custom": { "filterable": true } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "nested" },
+            "properties": [ { "id": "custom.hidden", "value": true } ] }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 30 },
+      "id": 6,
+      "options": { "sortBy": [ { "displayName": "Start time", "desc": true } ] },
+      "targets": [
+        {
+          "datasource": { "type": "tempo", "uid": "tempo" },
+          "queryType": "traceql",
+          "query": "{span:name=~\"form.submit.*\"}",
+          "refId": "A",
+          "limit": 50
+        }
+      ],
+      "title": "Form Submissions",
+      "type": "table"
+    },
+
+    {
+      "datasource": { "type": "tempo", "uid": "tempo" },
+      "description": "Unhandled errors and promise rejections. Span attributes: error.type (constructor name), error.message (sanitized — paths and query strings stripped). Span status is set to ERROR for alerting. Messages that may contain user input are never captured.",
+      "fieldConfig": {
+        "defaults": { "custom": { "filterable": true } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "nested" },
+            "properties": [ { "id": "custom.hidden", "value": true } ] }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 30 },
+      "id": 7,
+      "options": { "sortBy": [ { "displayName": "Start time", "desc": true } ] },
+      "targets": [
+        {
+          "datasource": { "type": "tempo", "uid": "tempo" },
+          "queryType": "traceql",
+          "query": "{span:name=~\"error.*\"}",
+          "refId": "A",
+          "limit": 50
+        }
+      ],
+      "title": "JavaScript Errors",
+      "type": "table"
+    }
+
+  ],
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "tags": ["blindspot", "ux", "opentelemetry"],
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Blindspot — Overview",
+  "uid": "blindspot-overview",
+  "version": 0
+}

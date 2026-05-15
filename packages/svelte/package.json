@@ -1,0 +1,46 @@
+{
+  "name": "@tindalabs/blindspot-svelte",
+  "version": "0.0.1",
+  "description": "Blindspot — Svelte / SvelteKit integration",
+  "keywords": ["opentelemetry", "observability", "frontend", "privacy", "ux", "svelte", "sveltekit"],
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": ["dist"],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src test"
+  },
+  "dependencies": {
+    "@tindalabs/blindspot": "workspace:*",
+    "@opentelemetry/api": "^1.9.1"
+  },
+  "peerDependencies": {
+    "svelte": ">=4"
+  },
+  "peerDependenciesMeta": {
+    "svelte": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^2.1.9",
+    "happy-dom": "^17.0.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.9"
+  }
+}

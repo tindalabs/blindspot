@@ -1,0 +1,53 @@
+{
+  "name": "@tindalabs/blindspot",
+  "version": "0.0.1",
+  "description": "Blindspot — auto-instrumentation bundle for browsers",
+  "keywords": ["opentelemetry", "observability", "frontend", "privacy", "ux", "telemetry"],
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist"],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src test",
+    "size": "size-limit"
+  },
+  "size-limit": [
+    {
+      "path": "./dist/index.js",
+      "limit": "12 KB",
+      "gzip": true
+    }
+  ],
+  "dependencies": {
+    "@tindalabs/blindspot-core": "workspace:*",
+    "@opentelemetry/api": "^1.9.1",
+    "@opentelemetry/core": "^2.7.1",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.217.0",
+    "@opentelemetry/sdk-trace-base": "^2.7.1",
+    "web-vitals": "^5.2.0"
+  },
+  "devDependencies": {
+    "@opentelemetry/sdk-trace-web": "^2.7.1",
+    "@size-limit/file": "^11.0.0",
+    "@vitest/coverage-v8": "^2.1.9",
+    "happy-dom": "^17.0.0",
+    "size-limit": "^11.0.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.9"
+  }
+}

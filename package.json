@@ -1,0 +1,26 @@
+{
+  "name": "blindspot",
+  "private": true,
+  "scripts": {
+    "build": "turbo build",
+    "test": "turbo test",
+    "type-check": "turbo type-check",
+    "lint": "turbo lint",
+    "docs:dev": "pnpm --filter @tindalabs/blindspot-docs dev",
+    "docs:build": "pnpm --filter @tindalabs/blindspot-docs build",
+    "docs:preview": "pnpm --filter @tindalabs/blindspot-docs preview",
+    "size": "pnpm --filter @tindalabs/blindspot build && pnpm --filter @tindalabs/blindspot size",
+    "e2e": "pnpm --filter @tindalabs/blindspot-e2e e2e"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^10.0.0",
+    "prettier": "^3.0.0",
+    "turbo": "^2.9.9",
+    "typescript": "^5.7.0"
+  },
+  "packageManager": "pnpm@9.15.4"
+}

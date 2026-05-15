@@ -1,0 +1,49 @@
+{
+  "name": "@tindalabs/blindspot-next",
+  "version": "0.0.1",
+  "description": "Blindspot — Next.js integration (App Router + Pages Router)",
+  "keywords": ["opentelemetry", "observability", "frontend", "privacy", "ux", "next", "nextjs"],
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist"],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src test"
+  },
+  "dependencies": {
+    "@tindalabs/blindspot": "workspace:*",
+    "@opentelemetry/api": "^1.9.1"
+  },
+  "peerDependencies": {
+    "next": ">=13",
+    "react": ">=18"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.0.0",
+    "@testing-library/jest-dom": "^6.6.0",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.1",
+    "@vitest/coverage-v8": "^2.1.9",
+    "happy-dom": "^17.0.0",
+    "next": "^14.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tsup": "^8.5.1",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.9"
+  }
+}
