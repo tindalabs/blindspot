@@ -20,7 +20,7 @@
           { "matcher": { "id": "byName", "options": "nested" },
             "properties": [ { "id": "custom.hidden", "value": true } ] },
           { "matcher": { "id": "byName", "options": "traceID" },
-            "properties": [ { "id": "links", "value": [ { "title": "Open trace", "url": "/explore?orgId=1&left={\"datasource\":\"tempo\",\"queries\":[{\"query\":\"${__value.raw}\",\"queryType\":\"traceId\",\"refId\":\"A\"}],\"range\":{\"from\":\"now-1h\",\"to\":\"now\"}}" } ] } ] }
+            "properties": [ { "id": "links", "value": [ { "title": "Open trace", "url": "/explore?schemaVersion=1&panes={\"r1\":{\"datasource\":\"tempo\",\"queries\":[{\"refId\":\"A\",\"query\":\"${__value.raw}\",\"queryType\":\"traceql\"}],\"range\":{\"from\":\"now-1h\",\"to\":\"now\"}}}&orgId=1" } ] } ] }
         ]
       },
       "gridPos": { "h": 10, "w": 24, "x": 0, "y": 1 },
@@ -51,7 +51,7 @@
           { "matcher": { "id": "byName", "options": "nested" },
             "properties": [ { "id": "custom.hidden", "value": true } ] },
           { "matcher": { "id": "byName", "options": "traceID" },
-            "properties": [ { "id": "links", "value": [ { "title": "Open trace", "url": "/explore?orgId=1&left={\"datasource\":\"tempo\",\"queries\":[{\"query\":\"${__value.raw}\",\"queryType\":\"traceId\",\"refId\":\"A\"}],\"range\":{\"from\":\"now-1h\",\"to\":\"now\"}}" } ] } ] }
+            "properties": [ { "id": "links", "value": [ { "title": "Open trace", "url": "/explore?schemaVersion=1&panes={\"r1\":{\"datasource\":\"tempo\",\"queries\":[{\"refId\":\"A\",\"query\":\"${__value.raw}\",\"queryType\":\"traceql\"}],\"range\":{\"from\":\"now-1h\",\"to\":\"now\"}}}&orgId=1" } ] } ] }
         ]
       },
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
@@ -79,7 +79,7 @@
           { "matcher": { "id": "byName", "options": "nested" },
             "properties": [ { "id": "custom.hidden", "value": true } ] },
           { "matcher": { "id": "byName", "options": "traceID" },
-            "properties": [ { "id": "links", "value": [ { "title": "Open trace", "url": "/explore?orgId=1&left={\"datasource\":\"tempo\",\"queries\":[{\"query\":\"${__value.raw}\",\"queryType\":\"traceId\",\"refId\":\"A\"}],\"range\":{\"from\":\"now-1h\",\"to\":\"now\"}}" } ] } ] }
+            "properties": [ { "id": "links", "value": [ { "title": "Open trace", "url": "/explore?schemaVersion=1&panes={\"r1\":{\"datasource\":\"tempo\",\"queries\":[{\"refId\":\"A\",\"query\":\"${__value.raw}\",\"queryType\":\"traceql\"}],\"range\":{\"from\":\"now-1h\",\"to\":\"now\"}}}&orgId=1" } ] } ] }
         ]
       },
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
@@ -110,7 +110,7 @@
           { "matcher": { "id": "byName", "options": "nested" },
             "properties": [ { "id": "custom.hidden", "value": true } ] },
           { "matcher": { "id": "byName", "options": "traceID" },
-            "properties": [ { "id": "links", "value": [ { "title": "Open trace", "url": "/explore?orgId=1&left={\"datasource\":\"tempo\",\"queries\":[{\"query\":\"${__value.raw}\",\"queryType\":\"traceId\",\"refId\":\"A\"}],\"range\":{\"from\":\"now-1h\",\"to\":\"now\"}}" } ] } ] }
+            "properties": [ { "id": "links", "value": [ { "title": "Open trace", "url": "/explore?schemaVersion=1&panes={\"r1\":{\"datasource\":\"tempo\",\"queries\":[{\"refId\":\"A\",\"query\":\"${__value.raw}\",\"queryType\":\"traceql\"}],\"range\":{\"from\":\"now-1h\",\"to\":\"now\"}}}&orgId=1" } ] } ] }
         ]
       },
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 21 },
@@ -138,7 +138,7 @@
           { "matcher": { "id": "byName", "options": "nested" },
             "properties": [ { "id": "custom.hidden", "value": true } ] },
           { "matcher": { "id": "byName", "options": "traceID" },
-            "properties": [ { "id": "links", "value": [ { "title": "Open trace", "url": "/explore?orgId=1&left={\"datasource\":\"tempo\",\"queries\":[{\"query\":\"${__value.raw}\",\"queryType\":\"traceId\",\"refId\":\"A\"}],\"range\":{\"from\":\"now-1h\",\"to\":\"now\"}}" } ] } ] }
+            "properties": [ { "id": "links", "value": [ { "title": "Open trace", "url": "/explore?schemaVersion=1&panes={\"r1\":{\"datasource\":\"tempo\",\"queries\":[{\"refId\":\"A\",\"query\":\"${__value.raw}\",\"queryType\":\"traceql\"}],\"range\":{\"from\":\"now-1h\",\"to\":\"now\"}}}&orgId=1" } ] } ] }
         ]
       },
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 21 },
@@ -169,7 +169,7 @@
           { "matcher": { "id": "byName", "options": "nested" },
             "properties": [ { "id": "custom.hidden", "value": true } ] },
           { "matcher": { "id": "byName", "options": "traceID" },
-            "properties": [ { "id": "links", "value": [ { "title": "Open trace", "url": "/explore?orgId=1&left={\"datasource\":\"tempo\",\"queries\":[{\"query\":\"${__value.raw}\",\"queryType\":\"traceId\",\"refId\":\"A\"}],\"range\":{\"from\":\"now-1h\",\"to\":\"now\"}}" } ] } ] }
+            "properties": [ { "id": "links", "value": [ { "title": "Open trace", "url": "/explore?schemaVersion=1&panes={\"r1\":{\"datasource\":\"tempo\",\"queries\":[{\"refId\":\"A\",\"query\":\"${__value.raw}\",\"queryType\":\"traceql\"}],\"range\":{\"from\":\"now-1h\",\"to\":\"now\"}}}&orgId=1" } ] } ] }
         ]
       },
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 30 },
@@ -197,7 +197,7 @@
           { "matcher": { "id": "byName", "options": "nested" },
             "properties": [ { "id": "custom.hidden", "value": true } ] },
           { "matcher": { "id": "byName", "options": "traceID" },
-            "properties": [ { "id": "links", "value": [ { "title": "Open trace", "url": "/explore?orgId=1&left={\"datasource\":\"tempo\",\"queries\":[{\"query\":\"${__value.raw}\",\"queryType\":\"traceId\",\"refId\":\"A\"}],\"range\":{\"from\":\"now-1h\",\"to\":\"now\"}}" } ] } ] }
+            "properties": [ { "id": "links", "value": [ { "title": "Open trace", "url": "/explore?schemaVersion=1&panes={\"r1\":{\"datasource\":\"tempo\",\"queries\":[{\"refId\":\"A\",\"query\":\"${__value.raw}\",\"queryType\":\"traceql\"}],\"range\":{\"from\":\"now-1h\",\"to\":\"now\"}}}&orgId=1" } ] } ] }
         ]
       },
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 30 },
