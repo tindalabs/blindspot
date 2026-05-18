@@ -1,7 +1,7 @@
 import { getTracer } from '@tindalabs/blindspot-core';
 import type { ResolvedConfig } from '@tindalabs/blindspot-core';
 import type { Context } from '@opentelemetry/api';
-import { setRouteSpan, clearRouteSpan, loadRouteContextAfterReload } from '../context.js';
+import { setRouteSpan, clearRouteSpan } from '../context.js';
 
 let _currentPath = '';
 
@@ -43,6 +43,5 @@ export function initRouting(_config: ResolvedConfig): void {
     navigate(location.pathname + location.search, _currentPath, 'back-forward');
   });
 
-  const reloadContext = loadRouteContextAfterReload();
-  navigate(location.pathname + location.search, '', 'initial', reloadContext);
+  navigate(location.pathname + location.search, '', 'initial');
 }
