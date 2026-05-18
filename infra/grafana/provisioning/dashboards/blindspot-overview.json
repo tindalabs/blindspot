@@ -18,7 +18,9 @@
         "defaults": { "custom": { "filterable": true } },
         "overrides": [
           { "matcher": { "id": "byName", "options": "nested" },
-            "properties": [ { "id": "custom.hidden", "value": true } ] }
+            "properties": [ { "id": "custom.hidden", "value": true } ] },
+          { "matcher": { "id": "byName", "options": "traceID" },
+            "properties": [ { "id": "links", "value": [ { "title": "Open trace", "url": "/explore?orgId=1&left={\"datasource\":\"tempo\",\"queries\":[{\"query\":\"${__value.raw}\",\"queryType\":\"traceId\",\"refId\":\"A\"}],\"range\":{\"from\":\"now-1h\",\"to\":\"now\"}}" } ] } ] }
         ]
       },
       "gridPos": { "h": 10, "w": 24, "x": 0, "y": 1 },
@@ -47,7 +49,9 @@
         "defaults": { "custom": { "filterable": true } },
         "overrides": [
           { "matcher": { "id": "byName", "options": "nested" },
-            "properties": [ { "id": "custom.hidden", "value": true } ] }
+            "properties": [ { "id": "custom.hidden", "value": true } ] },
+          { "matcher": { "id": "byName", "options": "traceID" },
+            "properties": [ { "id": "links", "value": [ { "title": "Open trace", "url": "/explore?orgId=1&left={\"datasource\":\"tempo\",\"queries\":[{\"query\":\"${__value.raw}\",\"queryType\":\"traceId\",\"refId\":\"A\"}],\"range\":{\"from\":\"now-1h\",\"to\":\"now\"}}" } ] } ] }
         ]
       },
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
@@ -73,7 +77,9 @@
         "defaults": { "custom": { "filterable": true } },
         "overrides": [
           { "matcher": { "id": "byName", "options": "nested" },
-            "properties": [ { "id": "custom.hidden", "value": true } ] }
+            "properties": [ { "id": "custom.hidden", "value": true } ] },
+          { "matcher": { "id": "byName", "options": "traceID" },
+            "properties": [ { "id": "links", "value": [ { "title": "Open trace", "url": "/explore?orgId=1&left={\"datasource\":\"tempo\",\"queries\":[{\"query\":\"${__value.raw}\",\"queryType\":\"traceId\",\"refId\":\"A\"}],\"range\":{\"from\":\"now-1h\",\"to\":\"now\"}}" } ] } ] }
         ]
       },
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
@@ -102,7 +108,9 @@
         "defaults": { "custom": { "filterable": true } },
         "overrides": [
           { "matcher": { "id": "byName", "options": "nested" },
-            "properties": [ { "id": "custom.hidden", "value": true } ] }
+            "properties": [ { "id": "custom.hidden", "value": true } ] },
+          { "matcher": { "id": "byName", "options": "traceID" },
+            "properties": [ { "id": "links", "value": [ { "title": "Open trace", "url": "/explore?orgId=1&left={\"datasource\":\"tempo\",\"queries\":[{\"query\":\"${__value.raw}\",\"queryType\":\"traceId\",\"refId\":\"A\"}],\"range\":{\"from\":\"now-1h\",\"to\":\"now\"}}" } ] } ] }
         ]
       },
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 21 },
@@ -128,7 +136,9 @@
         "defaults": { "custom": { "filterable": true } },
         "overrides": [
           { "matcher": { "id": "byName", "options": "nested" },
-            "properties": [ { "id": "custom.hidden", "value": true } ] }
+            "properties": [ { "id": "custom.hidden", "value": true } ] },
+          { "matcher": { "id": "byName", "options": "traceID" },
+            "properties": [ { "id": "links", "value": [ { "title": "Open trace", "url": "/explore?orgId=1&left={\"datasource\":\"tempo\",\"queries\":[{\"query\":\"${__value.raw}\",\"queryType\":\"traceId\",\"refId\":\"A\"}],\"range\":{\"from\":\"now-1h\",\"to\":\"now\"}}" } ] } ] }
         ]
       },
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 21 },
@@ -157,7 +167,9 @@
         "defaults": { "custom": { "filterable": true } },
         "overrides": [
           { "matcher": { "id": "byName", "options": "nested" },
-            "properties": [ { "id": "custom.hidden", "value": true } ] }
+            "properties": [ { "id": "custom.hidden", "value": true } ] },
+          { "matcher": { "id": "byName", "options": "traceID" },
+            "properties": [ { "id": "links", "value": [ { "title": "Open trace", "url": "/explore?orgId=1&left={\"datasource\":\"tempo\",\"queries\":[{\"query\":\"${__value.raw}\",\"queryType\":\"traceId\",\"refId\":\"A\"}],\"range\":{\"from\":\"now-1h\",\"to\":\"now\"}}" } ] } ] }
         ]
       },
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 30 },
@@ -183,7 +195,9 @@
         "defaults": { "custom": { "filterable": true } },
         "overrides": [
           { "matcher": { "id": "byName", "options": "nested" },
-            "properties": [ { "id": "custom.hidden", "value": true } ] }
+            "properties": [ { "id": "custom.hidden", "value": true } ] },
+          { "matcher": { "id": "byName", "options": "traceID" },
+            "properties": [ { "id": "links", "value": [ { "title": "Open trace", "url": "/explore?orgId=1&left={\"datasource\":\"tempo\",\"queries\":[{\"query\":\"${__value.raw}\",\"queryType\":\"traceId\",\"refId\":\"A\"}],\"range\":{\"from\":\"now-1h\",\"to\":\"now\"}}" } ] } ] }
         ]
       },
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 30 },
