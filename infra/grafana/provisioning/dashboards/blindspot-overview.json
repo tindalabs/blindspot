@@ -13,7 +13,7 @@
 
     {
       "datasource": { "type": "tempo", "uid": "tempo" },
-      "description": "All user sessions from the selected time range. Each row is one trace (page load → last interaction). Click any row to open the full waterfall — route spans, click spans, API calls, and web vitals. No PII is ever captured.",
+      "description": "One row per session entry point (navigation spans only). Each row represents a complete user flow — click a traceID to unfold the full waterfall: route transitions, clicks, API calls, and web vitals. Filter by Session above to isolate a single user's journey. No PII is ever captured.",
       "fieldConfig": {
         "defaults": { "custom": { "filterable": true } },
         "overrides": [
@@ -30,7 +30,7 @@
         {
           "datasource": { "type": "tempo", "uid": "tempo" },
           "queryType": "traceql",
-          "query": "{}",
+          "query": "{ rootName =~ \"navigation.*\" && resource.ux.session.id =~ \"${sessionId}\" }",
           "refId": "A",
           "limit": 20
         }
@@ -217,6 +217,29 @@
     }
 
   ],
+  "templating": {
+    "list": [
+      {
+        "datasource": { "type": "tempo", "uid": "tempo" },
+        "definition": "resource.ux.session.id",
+        "hide": 0,
+        "includeAll": true,
+        "allValue": ".*",
+        "label": "Session",
+        "multi": false,
+        "name": "sessionId",
+        "options": [],
+        "query": {
+          "query": "resource.ux.session.id",
+          "queryType": "tagValues"
+        },
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
   "refresh": "10s",
   "schemaVersion": 39,
   "tags": ["blindspot", "ux", "opentelemetry"],

@@ -2,6 +2,7 @@ import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
 import { AlwaysOnSampler, TraceIdRatioBasedSampler, type SpanExporter } from '@opentelemetry/sdk-trace-base';
+import { W3CTraceContextPropagator } from '@opentelemetry/core';
 import type { BlindspotConfig } from './config.js';
 import { resolveConfig } from './config.js';
 import { getOrCreateSessionId } from './session.js';
@@ -38,7 +39,7 @@ export function init(config: BlindspotConfig, exporter?: SpanExporter): void {
     spanProcessors: [_processor],
   });
 
-  provider.register();
+  provider.register({ propagator: new W3CTraceContextPropagator() });
 
   setServiceName(resolved.serviceName);
   _initialized = true;

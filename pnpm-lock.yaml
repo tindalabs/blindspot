@@ -53,12 +53,12 @@ importers:
 
   examples/basic:
     dependencies:
-      '@tindalabs/blindspot-core':
-        specifier: workspace:*
-        version: link:../../packages/core
       '@tindalabs/blindspot':
         specifier: workspace:*
         version: link:../../packages/web
+      '@tindalabs/blindspot-core':
+        specifier: workspace:*
+        version: link:../../packages/core
     devDependencies:
       vite:
         specifier: ^6.0.0
@@ -66,12 +66,12 @@ importers:
 
   examples/next-app-router:
     dependencies:
-      '@tindalabs/blindspot-next':
-        specifier: workspace:*
-        version: link:../../packages/next
       '@tindalabs/blindspot':
         specifier: workspace:*
         version: link:../../packages/web
+      '@tindalabs/blindspot-next':
+        specifier: workspace:*
+        version: link:../../packages/next
       next:
         specifier: ^14.2.0
         version: 14.2.35(@opentelemetry/api@1.9.1)(@playwright/test@1.60.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -97,12 +97,12 @@ importers:
 
   examples/react-basic:
     dependencies:
-      '@tindalabs/blindspot-react':
-        specifier: workspace:*
-        version: link:../../packages/react
       '@tindalabs/blindspot':
         specifier: workspace:*
         version: link:../../packages/web
+      '@tindalabs/blindspot-react':
+        specifier: workspace:*
+        version: link:../../packages/react
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -128,12 +128,12 @@ importers:
 
   examples/vue-basic:
     dependencies:
-      '@tindalabs/blindspot-vue':
-        specifier: workspace:*
-        version: link:../../packages/vue
       '@tindalabs/blindspot':
         specifier: workspace:*
         version: link:../../packages/web
+      '@tindalabs/blindspot-vue':
+        specifier: workspace:*
+        version: link:../../packages/vue
       vue:
         specifier: ^3.5.13
         version: 3.5.34(typescript@5.9.3)
@@ -153,6 +153,9 @@ importers:
       '@opentelemetry/api':
         specifier: ^1.9.1
         version: 1.9.1
+      '@opentelemetry/core':
+        specifier: ^2.7.1
+        version: 2.7.1(@opentelemetry/api@1.9.1)
       '@opentelemetry/exporter-trace-otlp-http':
         specifier: ^0.217.0
         version: 0.217.0(@opentelemetry/api@1.9.1)
@@ -187,12 +190,12 @@ importers:
 
   packages/next:
     dependencies:
-      '@tindalabs/blindspot':
-        specifier: workspace:*
-        version: link:../web
       '@opentelemetry/api':
         specifier: ^1.9.1
         version: 1.9.1
+      '@tindalabs/blindspot':
+        specifier: workspace:*
+        version: link:../web
     devDependencies:
       '@testing-library/jest-dom':
         specifier: ^6.6.0
@@ -233,12 +236,12 @@ importers:
 
   packages/react:
     dependencies:
-      '@tindalabs/blindspot':
-        specifier: workspace:*
-        version: link:../web
       '@opentelemetry/api':
         specifier: ^1.9.1
         version: 1.9.1
+      '@tindalabs/blindspot':
+        specifier: workspace:*
+        version: link:../web
     devDependencies:
       '@testing-library/jest-dom':
         specifier: ^6.6.0
@@ -279,12 +282,12 @@ importers:
 
   packages/svelte:
     dependencies:
-      '@tindalabs/blindspot':
-        specifier: workspace:*
-        version: link:../web
       '@opentelemetry/api':
         specifier: ^1.9.1
         version: 1.9.1
+      '@tindalabs/blindspot':
+        specifier: workspace:*
+        version: link:../web
       svelte:
         specifier: '>=4'
         version: 5.55.5(@typescript-eslint/types@8.59.2)
@@ -307,12 +310,12 @@ importers:
 
   packages/vue:
     dependencies:
-      '@tindalabs/blindspot':
-        specifier: workspace:*
-        version: link:../web
       '@opentelemetry/api':
         specifier: ^1.9.1
         version: 1.9.1
+      '@tindalabs/blindspot':
+        specifier: workspace:*
+        version: link:../web
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^5.2.3
@@ -344,9 +347,6 @@ importers:
 
   packages/web:
     dependencies:
-      '@tindalabs/blindspot-core':
-        specifier: workspace:*
-        version: link:../core
       '@opentelemetry/api':
         specifier: ^1.9.1
         version: 1.9.1
@@ -359,6 +359,9 @@ importers:
       '@opentelemetry/sdk-trace-base':
         specifier: ^2.7.1
         version: 2.7.1(@opentelemetry/api@1.9.1)
+      '@tindalabs/blindspot-core':
+        specifier: workspace:*
+        version: link:../core
       web-vitals:
         specifier: ^5.2.0
         version: 5.2.0
