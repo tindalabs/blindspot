@@ -32,7 +32,7 @@
         {
           "datasource": { "type": "tempo", "uid": "tempo" },
           "queryType": "traceql",
-          "query": "{ rootName =~ \"navigation.*\" }",
+          "query": "{span:name=~\"navigation.*\"}",
           "refId": "A",
           "limit": 20
         }
