@@ -170,6 +170,15 @@ Makes the SDK immediately demonstrable. Ships alongside Phase 2.
 - [ ] Entropy scoring — strings above a configurable entropy threshold (likely tokens or
       hashes) are redacted automatically, without needing an explicit RegExp
 
+### Behavioral signals (bot / abuse detection layer)
+
+These span attributes extend Blindspot's coverage from "what happened" to "does this session look human." They compose with Scent's risk engine and Shield's tamper signals — the same session that fails Shield's DevTools check and has an abnormally fast interaction velocity is a much stronger abuse signal.
+
+- [x] `ux.session.time_to_first_interaction_ms` — milliseconds from `performance.timeOrigin` to first click, keydown, or touch. Bots acting on page load produce values < 100ms; human median is 1–5 s. Recorded once per route span on first interaction.
+- [x] `ux.input.paste_ratio` — fraction of form-field characters that arrived via `paste` event vs typed keystroke, across the whole session. Account creation farms typically paste credentials; legitimate signups type them. Range 0–1; omitted if no input interaction occurred.
+- [x] `ux.interaction.mouse_entropy` — velocity variance score (0–1) derived from sampled mouse movement deltas during the session. Scripted mouse movement has near-zero variance; human movement has biological tremor and Fitts's Law deceleration. Omitted on touch-primary devices.
+- [x] `ux.session.interaction_rate_60s` — interaction count in the first 60 seconds of the session. Used to detect unnaturally high-speed account creation flows and click farms.
+
 ### Testing & compatibility
 - [x] E2E test suite (Playwright) against the example apps — smoke-tests golden paths
       for React, Vue, and Next.js App Router integrations (`e2e/` package; covers

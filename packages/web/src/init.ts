@@ -9,6 +9,7 @@ import { initFetch } from './instrumentations/fetch.js';
 import { initVitals } from './instrumentations/vitals.js';
 import { initErrors } from './instrumentations/errors.js';
 import { initLifecycle } from './instrumentations/lifecycle.js';
+import { initBehavior } from './instrumentations/behavior.js';
 
 let _initialized = false;
 
@@ -27,4 +28,5 @@ export function init(config: BlindspotConfig): void {
   if (resolved.instrument.vitals) initVitals(resolved);
   if (resolved.instrument.errors) initErrors(resolved);
   initLifecycle(resolved, beaconExporter);
+  initBehavior(resolved);
 }
