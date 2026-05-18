@@ -36,7 +36,7 @@
         }
       ],
       "title": "Recent UX Sessions",
-      "type": "table"
+      "type": "traces"
     },
 
     { "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 11 },
@@ -67,7 +67,7 @@
         }
       ],
       "title": "Rage Clicks — User Frustration",
-      "type": "table"
+      "type": "traces"
     },
 
     {
@@ -95,7 +95,7 @@
         }
       ],
       "title": "Dead Clicks — Broken Affordances",
-      "type": "table"
+      "type": "traces"
     },
 
     { "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 20 },
@@ -126,7 +126,7 @@
         }
       ],
       "title": "Navigation Patterns",
-      "type": "table"
+      "type": "traces"
     },
 
     {
@@ -154,7 +154,7 @@
         }
       ],
       "title": "API Calls — User-Perceived Latency",
-      "type": "table"
+      "type": "traces"
     },
 
     { "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 29 },
@@ -185,7 +185,7 @@
         }
       ],
       "title": "Form Submissions",
-      "type": "table"
+      "type": "traces"
     },
 
     {
@@ -213,7 +213,7 @@
         }
       ],
       "title": "JavaScript Errors",
-      "type": "table"
+      "type": "traces"
     }
 
   ],
