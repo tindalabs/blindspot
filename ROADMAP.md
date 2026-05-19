@@ -240,3 +240,48 @@ These span attributes extend Blindspot's coverage from "what happened" to "does 
       browser interaction spans (route, click, form, vitals)
 - [ ] Publish Grafana dashboard to grafana.com/dashboards
 - [ ] Publish OTel Collector contrib recipe
+
+---
+
+## Advisory Backlog — 2026-05-19
+
+Findings from a full C-level assessment (CTO / CPO / COO / CMO / CFO + competitive research).
+Overall score: **5.7/10** — the code and product deserve a 9; the distribution and process scaffolding score a 3.
+Full report: `c-level/reports/blindspot-ux_2026-05-19.md`
+
+### Immediate (this week)
+
+- [x] Add `LICENSE` file (MIT) to repo root — blocks every enterprise procurement tool and package auditor
+- [x] Add `.github/workflows/ci.yml` — lint + test + build on every PR and push to main
+- [ ] Enable branch protection on `main` requiring CI to pass before merge
+- [x] Add `.github/dependabot.yml` for npm monthly dependency updates
+- [x] Add `SECURITY.md` with maintainer contact and responsible disclosure path
+- [x] Add `# DO NOT USE IN PRODUCTION` comment to `infra/otel-collector.yaml` CORS wildcard + link to collector docs
+
+### Next Sprint (1–4 weeks)
+
+- [ ] Cut `0.1.0` release using Changesets; populate `CHANGELOG.md` with initial entries
+- [ ] Publish all 6 packages to npm (`blindspot-core`, `blindspot`, `blindspot-react`, `blindspot-vue`, `blindspot-next`, `blindspot-svelte`)
+- [ ] Add unit tests for `packages/web/src/instrumentations/fetch.ts`, `vitals.ts`, `errors.ts`, `behavior.ts` — currently untested
+- [ ] Publish Grafana dashboard to grafana.com/dashboards (also in Phase 7 / 11 above)
+- [ ] Write "Blindspot vs Session Replay" positioning page in docs — reference CIPA/WESCA litigation explicitly
+- [ ] Add CONTRIBUTING.md + PR template (`.github/PULL_REQUEST_TEMPLATE.md`)
+- [ ] Pin Docker image versions in `docker-compose.yml` (currently on `:latest` for all three services)
+- [ ] Add a troubleshooting guide to docs: "Spans not appearing? Check these 5 things"
+
+### Strategic (1–3 months)
+
+- [ ] Angular integration (`@tindalabs/blindspot-angular`) — Phase 10; closes 20%+ of enterprise frontend market
+- [ ] "Show HN" + r/webdev launch post timed to npm publish — primary community seeding event
+- [ ] Write 3 targeted blog posts: "Frontend OTel in 5 min", "Why we don't do session replay (and why that matters in 2026)", "Bot detection with OTel behavioral spans"
+- [ ] Feature behavioral signals (`ux.input.paste_ratio`, `ux.interaction.mouse_entropy`, `ux.session.time_to_first_interaction_ms`) prominently on README and docs homepage — currently buried in Phase 8
+- [ ] Reduce bus factor: solicit co-maintainers; write architecture decision log (ADRs)
+- [ ] Define Tindalabs monetization model before community reaches critical mass — OSS SDK + paid Tindalabs Cloud is the most natural path
+- [ ] Open upstream OTel SIG proposal for `ux.*` semantic conventions — turns Blindspot's namespace into the standard (also in Phase 11 Community section above)
+- [ ] Consider CNCF sandbox application once npm packages reach meaningful download volume
+
+### Watch List
+
+- **OTel Browser SIG velocity** — `opentelemetry-browser` repo launched 2025; if upstream ships first-class browser instrumentation, the auto-instrumentation layer becomes commodity. Deepen behavioral signals and privacy engine (non-commodifiable layers) proactively.
+- **Session replay competitor privacy modes** — if Datadog, Sentry, or OpenReplay ships architectural no-PII mode, primary differentiator narrows. Monitor their changelogs.
+- **Maintainer sustainability** — if release cadence falls below one release per quarter, initiate co-maintainer search or CNCF sandbox discussion.

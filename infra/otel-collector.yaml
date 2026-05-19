@@ -4,6 +4,9 @@ receivers:
       http:
         endpoint: 0.0.0.0:4318
         cors:
+          # DO NOT USE IN PRODUCTION — wildcard CORS allows any origin to send spans.
+          # Restrict to your domain(s) before deploying. See:
+          # https://github.com/open-telemetry/opentelemetry-collector/blob/main/config/confighttp/README.md#cors
           allowed_origins:
             - "*"
 
