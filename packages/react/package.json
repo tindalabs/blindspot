@@ -1,9 +1,31 @@
 {
   "name": "@tindalabs/blindspot-react",
   "version": "0.0.1",
-  "description": "Blindspot — React integration (BlindspotProvider, BlindspotRoutes, useSpan)",
-  "keywords": ["opentelemetry", "observability", "frontend", "privacy", "ux", "react"],
+  "description": "Blindspot — React integration. BlindspotProvider, BlindspotRoutes, and useSpan hook for React 18+ applications.",
+  "keywords": [
+    "opentelemetry",
+    "observability",
+    "frontend",
+    "privacy",
+    "ux",
+    "react",
+    "react-hooks",
+    "provider",
+    "telemetry",
+    "rum",
+    "tracing"
+  ],
   "license": "MIT",
+  "author": "Isonimus",
+  "homepage": "https://github.com/tindalabs/blindspot#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tindalabs/blindspot.git",
+    "directory": "packages/react"
+  },
+  "bugs": {
+    "url": "https://github.com/tindalabs/blindspot/issues"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",

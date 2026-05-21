@@ -2,8 +2,29 @@
   "name": "@tindalabs/blindspot-core",
   "version": "0.0.1",
   "description": "Privacy-first frontend observability — OTel wiring, privacy engine, session management",
-  "keywords": ["opentelemetry", "observability", "frontend", "privacy", "ux"],
+  "keywords": [
+    "opentelemetry",
+    "observability",
+    "frontend",
+    "privacy",
+    "ux",
+    "telemetry",
+    "rum",
+    "real-user-monitoring",
+    "session",
+    "tracing"
+  ],
   "license": "MIT",
+  "author": "Isonimus",
+  "homepage": "https://github.com/tindalabs/blindspot#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tindalabs/blindspot.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/tindalabs/blindspot/issues"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",

@@ -1,9 +1,33 @@
 {
   "name": "@tindalabs/blindspot-next",
   "version": "0.0.1",
-  "description": "Blindspot — Next.js integration (App Router + Pages Router)",
-  "keywords": ["opentelemetry", "observability", "frontend", "privacy", "ux", "next", "nextjs"],
+  "description": "Blindspot — Next.js integration supporting both App Router and Pages Router for server-rendered and hybrid applications.",
+  "keywords": [
+    "opentelemetry",
+    "observability",
+    "frontend",
+    "privacy",
+    "ux",
+    "next",
+    "nextjs",
+    "app-router",
+    "pages-router",
+    "server-components",
+    "telemetry",
+    "rum",
+    "tracing"
+  ],
   "license": "MIT",
+  "author": "Isonimus",
+  "homepage": "https://github.com/tindalabs/blindspot#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tindalabs/blindspot.git",
+    "directory": "packages/next"
+  },
+  "bugs": {
+    "url": "https://github.com/tindalabs/blindspot/issues"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",

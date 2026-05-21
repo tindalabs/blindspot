@@ -1,9 +1,31 @@
 {
   "name": "@tindalabs/blindspot-svelte",
   "version": "0.0.1",
-  "description": "Blindspot — Svelte / SvelteKit integration",
-  "keywords": ["opentelemetry", "observability", "frontend", "privacy", "ux", "svelte", "sveltekit"],
+  "description": "Blindspot — Svelte and SvelteKit integration with stores and lifecycle hooks for automatic telemetry.",
+  "keywords": [
+    "opentelemetry",
+    "observability",
+    "frontend",
+    "privacy",
+    "ux",
+    "svelte",
+    "sveltekit",
+    "store",
+    "telemetry",
+    "rum",
+    "tracing"
+  ],
   "license": "MIT",
+  "author": "Isonimus",
+  "homepage": "https://github.com/tindalabs/blindspot#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tindalabs/blindspot.git",
+    "directory": "packages/svelte"
+  },
+  "bugs": {
+    "url": "https://github.com/tindalabs/blindspot/issues"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",

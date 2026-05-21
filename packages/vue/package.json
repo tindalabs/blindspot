@@ -1,9 +1,32 @@
 {
   "name": "@tindalabs/blindspot-vue",
   "version": "0.0.1",
-  "description": "Blindspot — Vue 3 integration (BlindspotPlugin, useBlindspot)",
-  "keywords": ["opentelemetry", "observability", "frontend", "privacy", "ux", "vue"],
+  "description": "Blindspot — Vue 3 integration. BlindspotPlugin and useBlindspot composable for Vue 3 and Vue Router.",
+  "keywords": [
+    "opentelemetry",
+    "observability",
+    "frontend",
+    "privacy",
+    "ux",
+    "vue",
+    "vue3",
+    "composable",
+    "plugin",
+    "telemetry",
+    "rum",
+    "tracing"
+  ],
   "license": "MIT",
+  "author": "Isonimus",
+  "homepage": "https://github.com/tindalabs/blindspot#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tindalabs/blindspot.git",
+    "directory": "packages/vue"
+  },
+  "bugs": {
+    "url": "https://github.com/tindalabs/blindspot/issues"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",

@@ -1,9 +1,33 @@
 {
   "name": "@tindalabs/blindspot",
   "version": "0.0.1",
-  "description": "Blindspot — auto-instrumentation bundle for browsers",
-  "keywords": ["opentelemetry", "observability", "frontend", "privacy", "ux", "telemetry"],
+  "description": "Blindspot — privacy-first auto-instrumentation for browsers. Captures Web Vitals, custom spans, and user events with built-in PII filtering.",
+  "keywords": [
+    "opentelemetry",
+    "observability",
+    "frontend",
+    "privacy",
+    "ux",
+    "telemetry",
+    "browser",
+    "web",
+    "rum",
+    "real-user-monitoring",
+    "web-vitals",
+    "analytics",
+    "tracing"
+  ],
   "license": "MIT",
+  "author": "Isonimus",
+  "homepage": "https://github.com/tindalabs/blindspot#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tindalabs/blindspot.git",
+    "directory": "packages/web"
+  },
+  "bugs": {
+    "url": "https://github.com/tindalabs/blindspot/issues"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
