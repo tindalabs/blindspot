@@ -19,7 +19,7 @@ export function BlindspotProvider({ config, children }: BlindspotProviderProps) 
     if (initialized.current) return;
     initialized.current = true;
     init({ ...config, instrument: { ...config.instrument, routing: false } });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>

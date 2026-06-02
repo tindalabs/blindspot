@@ -19,7 +19,7 @@ export function BlindspotProvider({ config, children }: BlindspotProviderProps) 
     initialized.current = true;
     // Routing is handled by <BlindspotRoutes> or useBlindspotNavigate
     init({ ...config, instrument: { ...config.instrument, routing: false } });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <BlindspotContext.Provider value={true}>

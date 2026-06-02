@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { SpanStatusCode } from '@opentelemetry/api';
 import { BlindspotSpanProcessor } from '../src/processor.js';
 import type { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';

@@ -113,3 +113,15 @@ export function initBehavior(_config: ResolvedConfig): void {
     getRouteSpan()?.setAttribute('ux.session.interaction_rate_60s', state.interactionCount);
   }, 60_000);
 }
+
+export function _resetBehaviorForTesting(): void {
+  state.firstInteractionReported = false;
+  state.pasteCount = 0;
+  state.typedCount = 0;
+  state.interactionCount = 0;
+  state.rate60sReported = false;
+  state.mouseSamples = [];
+  state.lastMouseX = -1;
+  state.lastMouseY = -1;
+  state.lastMouseTime = -1;
+}
