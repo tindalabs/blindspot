@@ -22,5 +22,15 @@
     "turbo": "^2.9.9",
     "typescript": "^5.7.0"
   },
-  "packageManager": "pnpm@9.15.4"
+  "packageManager": "pnpm@9.15.4",
+  "pnpm": {
+    "overrides": {
+      "protobufjs@<8.0.2": ">=8.0.2",
+      "devalue@<5.8.1": ">=5.8.1",
+      "js-cookie@<3.0.7": ">=3.0.7",
+      "happy-dom@<20.8.9": ">=20.8.9",
+      "vitest@<4.1.0": ">=4.1.0",
+      "@vitest/coverage-v8@<4.1.0": ">=4.1.0"
+    }
+  }
 }
