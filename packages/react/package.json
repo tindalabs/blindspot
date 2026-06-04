@@ -1,6 +1,6 @@
 {
   "name": "@tindalabs/blindspot-react",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Blindspot — React integration. BlindspotProvider, BlindspotRoutes, and useSpan hook for React 18+ applications.",
   "keywords": [
     "opentelemetry",
@@ -42,7 +42,9 @@
       "types": "./dist/react-router.d.ts"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "sideEffects": false,
   "scripts": {
     "build": "tsup src/index.ts src/react-router.tsx --format esm,cjs --dts --clean --external react --external react-dom --external react-router-dom",
