@@ -1,6 +1,6 @@
 {
   "name": "@tindalabs/blindspot-next",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Blindspot — Next.js integration supporting both App Router and Pages Router for server-rendered and hybrid applications.",
   "keywords": [
     "opentelemetry",
