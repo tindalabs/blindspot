@@ -64,7 +64,7 @@
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.1",
     "@vitest/coverage-v8": "^2.1.9",
-    "happy-dom": "^17.0.0",
+    "happy-dom": "^20.10.1",
     "next": "^15.5.16",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

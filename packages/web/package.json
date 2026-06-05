@@ -64,13 +64,13 @@
     "@opentelemetry/core": "^2.7.1",
     "@opentelemetry/exporter-trace-otlp-http": "^0.218.0",
     "@opentelemetry/sdk-trace-base": "^2.7.1",
-    "web-vitals": "^5.2.0"
+    "web-vitals": "^5.3.0"
   },
   "devDependencies": {
     "@opentelemetry/sdk-trace-web": "^2.7.1",
     "@size-limit/file": "^12.1.0",
     "@vitest/coverage-v8": "^2.1.9",
-    "happy-dom": "^17.0.0",
+    "happy-dom": "^20.10.1",
     "size-limit": "^12.1.0",
     "tsup": "^8.5.1",
     "typescript": "^5.7.0",
