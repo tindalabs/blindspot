@@ -1,6 +1,6 @@
 {
   "name": "@tindalabs/blindspot-react",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Blindspot — React integration. BlindspotProvider, BlindspotRoutes, and useSpan hook for React 18+ applications.",
   "keywords": [
     "opentelemetry",

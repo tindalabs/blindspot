@@ -1,6 +1,6 @@
 {
   "name": "@tindalabs/blindspot-core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Privacy-first frontend observability — OTel wiring, privacy engine, session management",
   "keywords": [
     "opentelemetry",

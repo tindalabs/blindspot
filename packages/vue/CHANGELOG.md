@@ -1,5 +1,13 @@
 # @tindalabs/blindspot-vue
 
+## 0.1.1
+
+### Patch Changes
+
+- 39cbbfe: Add a per-package README (with badges and quick-start) so each package has proper docs on its npm page. No runtime or API changes.
+- Updated dependencies [39cbbfe]
+  - @tindalabs/blindspot@0.1.1
+
 ## 0.1.0
 
 ### Minor Changes
