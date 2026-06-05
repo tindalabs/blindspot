@@ -1,5 +1,10 @@
 # Blindspot
 
+[![npm version](https://img.shields.io/npm/v/@tindalabs/blindspot.svg)](https://www.npmjs.com/package/@tindalabs/blindspot)
+[![CI](https://github.com/tindalabs/blindspot/actions/workflows/ci.yml/badge.svg)](https://github.com/tindalabs/blindspot/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![types](https://img.shields.io/npm/types/@tindalabs/blindspot.svg)](https://www.npmjs.com/package/@tindalabs/blindspot)
+
 > Observability without surveillance — OpenTelemetry-native frontend SDK.
 
 Blindspot emits structured OTel spans from every user interaction: route navigations,
