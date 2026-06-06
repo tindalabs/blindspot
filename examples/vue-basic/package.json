@@ -10,7 +10,7 @@
     "@tindalabs/blindspot-vue": "workspace:*",
     "@tindalabs/blindspot": "workspace:*",
     "vue": "^3.5.35",
-    "vue-router": "^4.5.1"
+    "vue-router": "^5.1.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.3",
