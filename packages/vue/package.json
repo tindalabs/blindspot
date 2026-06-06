@@ -65,11 +65,11 @@
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.3",
     "@vitest/coverage-v8": "^2.1.9",
-    "@vue/test-utils": "^2.4.6",
-    "happy-dom": "^17.0.0",
+    "@vue/test-utils": "^2.4.11",
+    "happy-dom": "^20.10.1",
     "tsup": "^8.5.1",
     "typescript": "^5.7.0",
-    "vue": "^3.5.13",
+    "vue": "^3.5.35",
     "vue-router": "^4.5.1",
     "vitest": "^2.1.9"
   }
