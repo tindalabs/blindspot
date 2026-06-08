@@ -73,22 +73,29 @@ describe('BlindspotPagesRouter', () => {
     );
   });
 
-  it('registers routeChangeStart and routeChangeComplete handlers', () => {
+  it('registers only a routeChangeComplete handler (no separate routeChangeStart clear)', () => {
     render(<BlindspotPagesRouter />);
 
     const events = mockRouterEvents.on.mock.calls.map(([e]) => e);
-    expect(events).toContain('routeChangeStart');
     expect(events).toContain('routeChangeComplete');
+    expect(events).not.toContain('routeChangeStart');
   });
 
-  it('clears the span on routeChangeStart', () => {
+  it('clears then re-sets the route span atomically within routeChangeComplete', () => {
     render(<BlindspotPagesRouter />);
-    const handler = getEventHandler('routeChangeStart');
+    const handler = getEventHandler('routeChangeComplete');
     vi.clearAllMocks();
+    mockStartSpan.mockReturnValue({ end: vi.fn(), setAttribute: vi.fn(), addEvent: vi.fn() });
 
-    act(() => { handler?.(); });
+    act(() => { handler?.('/about'); });
 
+    // Clearing the previous span here (not on routeChangeStart) keeps a route
+    // span active through the navigation, so in-route activity nests.
     expect(mockClearRouteSpan).toHaveBeenCalledTimes(1);
+    expect(mockSetRouteSpan).toHaveBeenCalledTimes(1);
+    expect(mockClearRouteSpan.mock.invocationCallOrder[0]!).toBeLessThan(
+      mockSetRouteSpan.mock.invocationCallOrder[0]!,
+    );
   });
 
   it('creates a new span on routeChangeComplete', () => {
@@ -118,8 +125,8 @@ describe('BlindspotPagesRouter', () => {
 
     unmount();
 
-    expect(mockRouterEvents.off).toHaveBeenCalledWith('routeChangeStart', expect.any(Function));
     expect(mockRouterEvents.off).toHaveBeenCalledWith('routeChangeComplete', expect.any(Function));
+    expect(mockRouterEvents.off).not.toHaveBeenCalledWith('routeChangeStart', expect.any(Function));
     expect(mockClearRouteSpan).toHaveBeenCalledTimes(1);
   });
 });

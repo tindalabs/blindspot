@@ -23,9 +23,12 @@ import type { NavigationEvent } from '../src/router.js';
 function makeHooks() {
   let beforeHook: ((nav: { cancel: () => void }) => void) | undefined;
   let afterHook: ((nav: NavigationEvent) => void) | undefined;
+  let beforeRegistered = false;
 
   return {
+    get beforeRegistered() { return beforeRegistered; },
     beforeNavigate(fn: (nav: { cancel: () => void }) => void) {
+      beforeRegistered = true;
       beforeHook = fn;
     },
     afterNavigate(fn: (nav: NavigationEvent) => void) {
@@ -75,15 +78,28 @@ describe('installBlindspotRouter', () => {
     expect(mockSetRouteSpan).toHaveBeenCalledTimes(1);
   });
 
-  it('clears the previous span on beforeNavigate', () => {
+  it('does not register a beforeNavigate guard (avoids the root-context gap)', () => {
+    const hooks = makeHooks();
+    installBlindspotRouter(hooks);
+    // Clearing in a separate beforeNavigate ended the route span before
+    // afterNavigate re-set it — in-route activity in that gap orphaned.
+    expect(hooks.beforeRegistered).toBe(false);
+  });
+
+  it('clears then re-sets the route span atomically within afterNavigate', () => {
     const hooks = makeHooks();
     installBlindspotRouter(hooks);
     hooks.navigate(null, '/home');
-    vi.clearAllMocks();
-    mockLoadRouteContextAfterReload.mockReturnValue(undefined);
-    hooks.navigate('/home', '/about');
 
     expect(mockClearRouteSpan).toHaveBeenCalledTimes(1);
+    expect(mockSetRouteSpan).toHaveBeenCalledTimes(1);
+    expect(mockClearRouteSpan.mock.invocationCallOrder[0]!).toBeLessThan(
+      mockSetRouteSpan.mock.invocationCallOrder[0]!,
+    );
+
+    hooks.navigate('/home', '/about');
+    expect(mockClearRouteSpan).toHaveBeenCalledTimes(2);
+    expect(mockSetRouteSpan).toHaveBeenCalledTimes(2);
   });
 
   it('records from/to path on subsequent navigation', () => {
