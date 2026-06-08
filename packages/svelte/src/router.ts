@@ -26,15 +26,18 @@ export function installBlindspotRouter(hooks: NavigationHooks): void {
   let isFirst = true;
   let prevPath = '';
 
-  hooks.beforeNavigate(() => {
-    clearRouteSpan();
-  });
-
   hooks.afterNavigate((nav) => {
     const search = nav.to.url.search;
     const toPath = nav.to.url.pathname + (search ? search : '');
     const trigger = isFirst ? 'initial' : 'user';
     isFirst = false;
+
+    // End the previous route span and open the new one atomically, so a route
+    // span is active at all times. Clearing in a separate beforeNavigate left a
+    // window where getRouteContext() was root — in-route clicks/fetch/errors
+    // fired in that gap orphaned into their own root trace instead of nesting.
+    clearRouteSpan();
+
     const parentContext =
       trigger === 'initial' ? loadRouteContextAfterReload() : undefined;
     const span = getTracer().startSpan(

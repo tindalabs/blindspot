@@ -29,12 +29,13 @@ export function BlindspotPagesRouter() {
     setRouteSpan(span);
     prevPath.current = initialPath;
 
-    function onRouteChangeStart() {
-      clearRouteSpan();
-    }
-
     function onRouteChangeComplete(url: string) {
       const from = prevPath.current;
+      // End the previous route span and open the new one atomically here, on
+      // routeChangeComplete. Clearing on routeChangeStart instead left the route
+      // context root for the whole navigation, so in-route activity that fired
+      // during the transition orphaned into its own root trace.
+      clearRouteSpan();
       const nextSpan = getTracer().startSpan(
         `navigation ${from} → ${url}`,
         {
@@ -49,11 +50,9 @@ export function BlindspotPagesRouter() {
       prevPath.current = url;
     }
 
-    router.events.on('routeChangeStart', onRouteChangeStart);
     router.events.on('routeChangeComplete', onRouteChangeComplete);
 
     return () => {
-      router.events.off('routeChangeStart', onRouteChangeStart);
       router.events.off('routeChangeComplete', onRouteChangeComplete);
       clearRouteSpan();
     };
