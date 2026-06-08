@@ -1,6 +1,6 @@
 {
   "name": "@tindalabs/blindspot-svelte",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Blindspot — Svelte and SvelteKit integration with stores and lifecycle hooks for automatic telemetry.",
   "keywords": [
     "opentelemetry",
