@@ -76,4 +76,27 @@ describe('initErrors', () => {
     const exc = span.events.find((e) => e.name === 'exception');
     expect((exc?.attributes?.['exception.message'] as string).length).toBeLessThanOrEqual(256);
   });
+
+  it("falls back to 'Error' when the event carries no error object", () => {
+    // Resource-load failures and some synthetic events fire 'error' with no
+    // `.error` — the type must degrade gracefully rather than throw.
+    window.dispatchEvent(new ErrorEvent('error', { message: 'no error object' }));
+    const [span] = exporter.getFinishedSpans();
+    const exc = span.events.find((e) => e.name === 'exception');
+    expect(exc?.attributes?.['exception.type']).toBe('Error');
+  });
+
+  it('strips file paths out of error messages', () => {
+    window.dispatchEvent(
+      new ErrorEvent('error', {
+        message: 'Boom at /src/app/checkout.js:42:7 in handler',
+        error: new Error(),
+      }),
+    );
+    const [span] = exporter.getFinishedSpans();
+    const exc = span.events.find((e) => e.name === 'exception');
+    const msg = exc?.attributes?.['exception.message'] as string;
+    expect(msg).not.toContain('checkout.js');
+    expect(msg).toContain('[file]');
+  });
 });
