@@ -103,7 +103,7 @@ test.describe('vue-basic — network spans', () => {
 
     // Click "Fetch task data" (Vue has a data-blindspot-label on this button).
     await Promise.all([
-      page.waitForResponse(/jsonplaceholder\.typicode\.com/),
+      page.waitForResponse(/^https:\/\/jsonplaceholder\.typicode\.com\//),
       page.click('[data-blindspot-label="fetch-task-data"]'),
     ]);
     await flushSpans(page);

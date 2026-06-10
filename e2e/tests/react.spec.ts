@@ -108,7 +108,7 @@ test.describe('react-basic — network spans', () => {
 
     // Click "Fetch task data" and wait for the mocked response.
     await Promise.all([
-      page.waitForResponse(/jsonplaceholder\.typicode\.com/),
+      page.waitForResponse(/^https:\/\/jsonplaceholder\.typicode\.com\//),
       page.click('button.btn-primary'),
     ]);
     await flushSpans(page);

@@ -108,7 +108,7 @@ test.describe('next-app-router — network spans', () => {
     await page.goto('/');
 
     await Promise.all([
-      page.waitForResponse(/jsonplaceholder\.typicode\.com/),
+      page.waitForResponse(/^https:\/\/jsonplaceholder\.typicode\.com\//),
       page.click('[data-blindspot-label="fetch-task-data"]'),
     ]);
     await flushSpans(page);
