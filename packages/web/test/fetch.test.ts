@@ -118,6 +118,52 @@ describe('initFetch — self-instrumentation guard', () => {
   });
 });
 
+describe('initFetch — header-shape normalization', () => {
+  it('merges traceparent into a Headers instance without dropping existing entries', async () => {
+    await window.fetch('/api/data', { headers: new Headers({ 'x-custom': 'keep-me' }) });
+    const headers = lastInit?.headers as Record<string, string>;
+    expect(headers['x-custom']).toBe('keep-me');
+    expect(headers.traceparent).toMatch(/^00-[0-9a-f]{32}-[0-9a-f]{16}-[0-9a-f]{2}$/);
+  });
+
+  it('merges traceparent into array-of-tuples headers without dropping existing entries', async () => {
+    await window.fetch('/api/data', { headers: [['x-custom', 'keep-me']] });
+    const headers = lastInit?.headers as Record<string, string>;
+    expect(headers['x-custom']).toBe('keep-me');
+    expect(headers.traceparent).toBeDefined();
+  });
+});
+
+describe('initFetch — input types', () => {
+  it('instruments a URL-object input', async () => {
+    await window.fetch(new URL('https://api.example.com/things'));
+    const [span] = exporter.getFinishedSpans();
+    expect(span.name).toBe('GET /things');
+    expect(span.attributes['url.full']).toBe('https://api.example.com/things');
+  });
+
+  it('derives the method from a Request-object input', async () => {
+    await window.fetch(new Request('/api/orders', { method: 'POST' }));
+    const [span] = exporter.getFinishedSpans();
+    expect(span.attributes['http.request.method']).toBe('POST');
+    expect(span.name).toBe('POST /api/orders');
+    // The wrapper re-wraps the Request so the injected traceparent rides along.
+    expect((lastInit?.headers as Record<string, string>).traceparent).toBeDefined();
+  });
+});
+
+describe('initFetch — malformed URL', () => {
+  it('falls back to the raw URL in the span name when URL parsing throws', async () => {
+    await window.fetch('http://[malformed');
+    const [span] = exporter.getFinishedSpans();
+    // getPathname() and the self-instrumentation guard both swallow the parse
+    // error; the request is still instrumented using the raw URL string.
+    expect(span.name).toBe('GET http://[malformed');
+    expect(span.attributes['url.full']).toBe('http://[malformed');
+    expect((lastInit?.headers as Record<string, string>).traceparent).toBeDefined();
+  });
+});
+
 describe('initFetch — privacy invariants', () => {
   it('does not capture request body or authorization headers', async () => {
     await window.fetch('/api/login', {
