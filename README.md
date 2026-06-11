@@ -4,12 +4,15 @@
 [![CI](https://github.com/tindalabs/blindspot/actions/workflows/ci.yml/badge.svg)](https://github.com/tindalabs/blindspot/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![types](https://img.shields.io/npm/types/@tindalabs/blindspot.svg)](https://www.npmjs.com/package/@tindalabs/blindspot)
+[![Live demo](https://img.shields.io/badge/live-demo-4f46e5.svg)](https://tindalabs.github.io/tindalabs.dev/)
 
 > Observability without surveillance — OpenTelemetry-native frontend SDK.
 
 Blindspot emits structured OTel spans from every user interaction: route navigations,
 clicks, form submissions, fetch calls, and web vitals. Spans correlate with your backend
 traces via W3C `traceparent`. No DOM snapshots. No PII.
+
+**[Live demo](https://tindalabs.github.io/tindalabs.dev/)** — run Blindspot, Shield and Scent together in your browser and watch real OTel spans render in-page.
 
 ## Local dev stack — < 5 minutes to first trace
 
