@@ -50,7 +50,7 @@ jobs:
       # the "Version Packages" PR. NPM_CONFIG_PROVENANCE emits provenance
       # attestation, signed via the same OIDC id-token.
       - name: Create release PR or publish
-        uses: changesets/action@v1
+        uses: changesets/action@v2
         with:
           publish: pnpm changeset publish
           title: "chore: version packages"
