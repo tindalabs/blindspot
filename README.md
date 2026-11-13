@@ -19,7 +19,7 @@ traces via W3C `traceparent`. No DOM snapshots. No PII.
 ### Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/) with the Compose plugin
-- [Node 18+](https://nodejs.org/) and [pnpm](https://pnpm.io/) (`corepack enable`)
+- [Node 22.18+](https://nodejs.org/) (see `.nvmrc`) and [pnpm](https://pnpm.io/) (`corepack enable`)
 
 ### 1 — Start the observability stack
 
