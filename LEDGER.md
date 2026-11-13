@@ -179,3 +179,19 @@ Publishing depends on the npm version.
 upgrade, which **verify** rather than assume), a dry run with the new npm major passes
 (`npm publish --dry-run` with the flags changesets uses), and the pin moves to that
 major.
+
+## L17: `react-router-dom` is imported but not declared as a peer (medium, needs a decision)
+
+**Where:** the `./react-router` entry of [`packages/react`](packages/react/package.json)
+(`src/react-router.tsx`), and [`docs/framework/react.md`](docs/framework/react.md)
+
+`peerDependenciesMeta` marks `react-router-dom` optional, but `peerDependencies` has no
+entry for it, so the meta does nothing and no version is declared. The subpath resolves
+in consumers only when their package manager happens to hoist the router; strict layouts
+such as Yarn PnP refuse the import. The docs promise React Router v6, while the dev
+dependency, the example and e2e run 7.
+
+**Closed when:** the supported router majors are decided (6 and 7, or 7 only) and
+measured, `react-router-dom` is declared as an optional peer with that range in a
+changeset, the docs state it, and every major in the range is tested, as for React (see
+the React 18 job in `ci.yml`).
