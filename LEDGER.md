@@ -9,27 +9,6 @@ Severity: **high** (wrong data or privacy exposure), **medium** (misleading docs
 
 ---
 
-## L3: ARCHITECTURE.md says "Session = Trace"; the code does Route = Trace (medium)
-
-**Where:** [`ARCHITECTURE.md`](ARCHITECTURE.md), the "Semantic Model" section and the
-"Key Technical Decisions" row `Session = Trace, Route = root Span`
-
-`routing.ts` starts every navigation span with no parent, so each route is its own trace.
-The session is joined only by the `ux.session.id` **resource** attribute. The code's
-choice is the sound one: a trace that lasts a whole session never completes, breaks
-backend trace-size and duration limits, and makes every fetch's backend trace a
-descendant of one giant tree.
-
-**Why it matters:** trace vs. session is the most common OTel beginner confusion, and
-this doc teaches the wrong answer. Users writing TraceQL against "one trace per session"
-get wrong results.
-
-**Closed when:** the semantic model diagram and decision row describe one trace per
-route, with the session joined by a resource attribute, and the reason. Also fix the
-attribute-taxonomy example in the same section, which shows `ux.session.id` as a span
-attribute (it is a resource attribute) and `http.url` (the code emits the current
-semconv `url.full`).
-
 ## L4: Decision table claims wrappers the code does not use (medium)
 
 **Where:** [`ARCHITECTURE.md`](ARCHITECTURE.md), the "Key Technical Decisions" rows for

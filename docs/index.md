@@ -16,7 +16,7 @@ hero:
 features:
   - icon: 🔭
     title: OpenTelemetry Native
-    details: Built on @opentelemetry/sdk-trace-web. Session = Trace, Route = root Span, Interaction = child Span. Natively queryable in Tempo, Jaeger, Honeycomb, or any OTel backend — no custom tooling needed.
+    details: Built on @opentelemetry/sdk-trace-web. Route = Trace, Interaction = child Span, and the session joins them as a resource attribute. Natively queryable in Tempo, Jaeger, Honeycomb, or any OTel backend, no custom tooling needed.
 
   - icon: 🔒
     title: Privacy First

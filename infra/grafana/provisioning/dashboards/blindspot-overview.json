@@ -13,7 +13,7 @@
 
     {
       "datasource": { "type": "tempo", "uid": "tempo" },
-      "description": "One row per session entry point (navigation spans only). Each row represents a complete user flow — click a traceID to unfold the full waterfall: route transitions, clicks, API calls, and web vitals. Filter by Session above to isolate a single user's journey. No PII is ever captured.",
+      "description": "One row per route: each route is its own trace, rooted at its navigation span. Click a traceID to unfold that route's waterfall: clicks, API calls, and web vitals. A session is all the routes with the same ux.session.id resource attribute; pick one in the Session filter above to follow a single tab's journey. No PII is ever captured.",
       "fieldConfig": {
         "defaults": { "custom": { "filterable": true } },
         "overrides": [
@@ -32,12 +32,12 @@
         {
           "datasource": { "type": "tempo", "uid": "tempo" },
           "queryType": "traceql",
-          "query": "{span:name=~\"navigation.*\"}",
+          "query": "{span:name=~\"navigation.*\" && resource.ux.session.id=~\"$sessionId\"}",
           "refId": "A",
           "limit": 20
         }
       ],
-      "title": "Recent UX Sessions",
+      "title": "Recent Routes",
       "type": "table"
     },
 
@@ -46,7 +46,7 @@
 
     {
       "datasource": { "type": "tempo", "uid": "tempo" },
-      "description": "Sessions containing rapid repeated clicks on the same target (≥ 3 clicks within 500 ms). A rage click means the user expected a response and didn't get one. Span attributes: ux.element.label, ux.element.tag, ux.element.role.",
+      "description": "Clicks that were part of rapid repeated clicks on the same target (≥ 3 clicks within 500 ms). A rage click means the user expected a response and didn't get one. Span attributes: ux.element.label, ux.element.tag, ux.element.role.",
       "fieldConfig": {
         "defaults": { "custom": { "filterable": true } },
         "overrides": [
@@ -65,7 +65,7 @@
         {
           "datasource": { "type": "tempo", "uid": "tempo" },
           "queryType": "traceql",
-          "query": "{span.ux.rage_click=true}",
+          "query": "{span.ux.rage_click=true && resource.ux.session.id=~\"$sessionId\"}",
           "refId": "A",
           "limit": 50
         }
@@ -76,7 +76,7 @@
 
     {
       "datasource": { "type": "tempo", "uid": "tempo" },
-      "description": "Sessions where a user clicked a non-interactive element (div, span, p, img, etc.). Indicates a visual affordance problem — something looks clickable but isn't. Span attributes: ux.element.label, ux.element.tag.",
+      "description": "Clicks on a non-interactive element (div, span, p, img, etc.). Indicates a visual affordance problem: something looks clickable but isn't. Span attributes: ux.element.label, ux.element.tag.",
       "fieldConfig": {
         "defaults": { "custom": { "filterable": true } },
         "overrides": [
@@ -95,7 +95,7 @@
         {
           "datasource": { "type": "tempo", "uid": "tempo" },
           "queryType": "traceql",
-          "query": "{span.ux.dead_click=true}",
+          "query": "{span.ux.dead_click=true && resource.ux.session.id=~\"$sessionId\"}",
           "refId": "A",
           "limit": 50
         }
@@ -128,7 +128,7 @@
         {
           "datasource": { "type": "tempo", "uid": "tempo" },
           "queryType": "traceql",
-          "query": "{span:name=~\"navigation.*\" && span.ux.route.trigger != \"resume\"}",
+          "query": "{span:name=~\"navigation.*\" && span.ux.route.trigger != \"resume\" && resource.ux.session.id=~\"$sessionId\"}",
           "refId": "A",
           "limit": 50
         }
@@ -158,7 +158,7 @@
         {
           "datasource": { "type": "tempo", "uid": "tempo" },
           "queryType": "traceql",
-          "query": "{span.ux.api.user_wait_ms > 0}",
+          "query": "{span.ux.api.user_wait_ms > 0 && resource.ux.session.id=~\"$sessionId\"}",
           "refId": "A",
           "limit": 50
         }
@@ -191,7 +191,7 @@
         {
           "datasource": { "type": "tempo", "uid": "tempo" },
           "queryType": "traceql",
-          "query": "{span:name=~\"form.submit.*\"}",
+          "query": "{span:name=~\"form.submit.*\" && resource.ux.session.id=~\"$sessionId\"}",
           "refId": "A",
           "limit": 50
         }
@@ -221,7 +221,7 @@
         {
           "datasource": { "type": "tempo", "uid": "tempo" },
           "queryType": "traceql",
-          "query": "{span:name=~\"error.*\"}",
+          "query": "{span:name=~\"error.*\" && resource.ux.session.id=~\"$sessionId\"}",
           "refId": "A",
           "limit": 50
         }
