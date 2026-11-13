@@ -1,12 +1,13 @@
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
-import { AlwaysOnSampler, TraceIdRatioBasedSampler, type SpanExporter } from '@opentelemetry/sdk-trace-base';
+import { AlwaysOffSampler, AlwaysOnSampler, type SpanExporter } from '@opentelemetry/sdk-trace-base';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
 import type { BlindspotConfig } from './config.js';
 import { resolveConfig } from './config.js';
 import { getOrCreateSessionId } from './session.js';
 import { BlindspotSpanProcessor } from './processor.js';
+import { isSessionSampled } from './sampling.js';
 import { setServiceName } from './tracer.js';
 
 let _processor: BlindspotSpanProcessor | undefined;
@@ -27,11 +28,14 @@ export function init(config: BlindspotConfig, exporter?: SpanExporter): void {
   });
 
   const _exporter = exporter ?? new OTLPTraceExporter({ url: resolved.endpoint });
-  _processor = new BlindspotSpanProcessor(_exporter, resolved);
+  const sessionSampled = isSessionSampled(sessionId, resolved.sampling.rate);
+  _processor = new BlindspotSpanProcessor(_exporter, resolved, sessionSampled);
 
-  const sampler = resolved.sampling.errorAware
+  // errorAware records everything and lets the processor decide, because an
+  // error later in an unsampled session still keeps it.
+  const sampler = resolved.sampling.errorAware || sessionSampled
     ? new AlwaysOnSampler()
-    : new TraceIdRatioBasedSampler(resolved.sampling.rate);
+    : new AlwaysOffSampler();
 
   const provider = new WebTracerProvider({
     resource,

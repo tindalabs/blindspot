@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { SpanStatusCode, type Span } from '@opentelemetry/api';
 import { BlindspotSpanProcessor } from '../src/processor.js';
 import {
@@ -8,6 +8,9 @@ import {
   type SpanExporter,
 } from '@opentelemetry/sdk-trace-base';
 import type { ResolvedConfig } from '../src/config.js';
+
+const SAMPLED = true;
+const NOT_SAMPLED = false;
 
 function makeConfig(overrides: Partial<ResolvedConfig['sampling']> = {}): ResolvedConfig {
   return {
@@ -66,7 +69,7 @@ function makeExporter(): SpanExporter & { exported: ReadableSpan[] } {
 describe('BlindspotSpanProcessor — normal mode', () => {
   it('routes spans directly to batch on onEnd when consented', async () => {
     const exporter = makeExporter();
-    const proc = new BlindspotSpanProcessor(exporter, makeConfig());
+    const proc = new BlindspotSpanProcessor(exporter, makeConfig(), SAMPLED);
     proc.onEnd(makeSpan());
     await proc.forceFlush();
     expect(exporter.exported).toHaveLength(1);
@@ -76,7 +79,7 @@ describe('BlindspotSpanProcessor — normal mode', () => {
     const config = makeConfig();
     config.privacy.consentRequired = true;
     const exporter = makeExporter();
-    const proc = new BlindspotSpanProcessor(exporter, config);
+    const proc = new BlindspotSpanProcessor(exporter, config, SAMPLED);
     proc.onEnd(makeSpan());
     await proc.forceFlush();
     expect(exporter.exported).toHaveLength(0);
@@ -87,9 +90,9 @@ describe('BlindspotSpanProcessor — normal mode', () => {
 
   it('commitSession is a no-op in normal mode', async () => {
     const exporter = makeExporter();
-    const proc = new BlindspotSpanProcessor(exporter, makeConfig());
+    const proc = new BlindspotSpanProcessor(exporter, makeConfig(), SAMPLED);
     proc.onEnd(makeSpan());
-    proc.commitSession(0); // rate=0, but shouldn't affect normal mode
+    proc.commitSession();
     await proc.forceFlush();
     expect(exporter.exported).toHaveLength(1);
   });
@@ -100,47 +103,47 @@ describe('BlindspotSpanProcessor — normal mode', () => {
 describe('BlindspotSpanProcessor — errorAware mode', () => {
   it('buffers spans until commitSession is called', async () => {
     const exporter = makeExporter();
-    const proc = new BlindspotSpanProcessor(exporter, makeConfig({ errorAware: true }));
+    const proc = new BlindspotSpanProcessor(exporter, makeConfig({ errorAware: true }), SAMPLED);
     proc.onEnd(makeSpan());
     proc.onEnd(makeSpan());
     await proc.forceFlush();
     expect(exporter.exported).toHaveLength(0); // still buffered
   });
 
-  it('flushes session buffer when rate=1 and no error', async () => {
+  it('flushes the buffer of a sampled session with no error', async () => {
     const exporter = makeExporter();
-    const proc = new BlindspotSpanProcessor(exporter, makeConfig({ errorAware: true, rate: 1 }));
+    const proc = new BlindspotSpanProcessor(exporter, makeConfig({ errorAware: true }), SAMPLED);
     proc.onEnd(makeSpan());
     proc.onEnd(makeSpan());
-    proc.commitSession(1);
+    proc.commitSession();
     await proc.forceFlush();
     expect(exporter.exported).toHaveLength(2);
   });
 
-  it('drops session buffer when rate=0 and no error', async () => {
+  it('drops the buffer of an unsampled session with no error', async () => {
     const exporter = makeExporter();
-    const proc = new BlindspotSpanProcessor(exporter, makeConfig({ errorAware: true, rate: 0 }));
+    const proc = new BlindspotSpanProcessor(exporter, makeConfig({ errorAware: true }), NOT_SAMPLED);
     proc.onEnd(makeSpan());
     proc.onEnd(makeSpan());
-    proc.commitSession(0);
+    proc.commitSession();
     await proc.forceFlush();
     expect(exporter.exported).toHaveLength(0);
   });
 
-  it('flushes everything when error detected, regardless of rate', async () => {
+  it('flushes everything when an error is seen, even in an unsampled session', async () => {
     const exporter = makeExporter();
-    const proc = new BlindspotSpanProcessor(exporter, makeConfig({ errorAware: true, rate: 0 }));
+    const proc = new BlindspotSpanProcessor(exporter, makeConfig({ errorAware: true }), NOT_SAMPLED);
     proc.onEnd(makeSpan('before-error'));
     proc.onEnd(makeSpan('error-span', SpanStatusCode.ERROR));
     proc.onEnd(makeSpan('after-error'));
-    proc.commitSession(0); // rate=0 should be overridden by error flag
+    proc.commitSession();
     await proc.forceFlush();
     expect(exporter.exported).toHaveLength(3);
   });
 
   it('flushes buffered spans immediately when error span arrives', async () => {
     const exporter = makeExporter();
-    const proc = new BlindspotSpanProcessor(exporter, makeConfig({ errorAware: true, rate: 0 }));
+    const proc = new BlindspotSpanProcessor(exporter, makeConfig({ errorAware: true }), NOT_SAMPLED);
     proc.onEnd(makeSpan('span-1'));
     proc.onEnd(makeSpan('span-2'));
     // Error arrives — buffered spans should be routed to batch right now
@@ -150,46 +153,24 @@ describe('BlindspotSpanProcessor — errorAware mode', () => {
     expect(exporter.exported).toHaveLength(3);
   });
 
-  it('uses Math.random() to decide when rate is between 0 and 1', async () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.4);
-    const exporter = makeExporter();
-    const proc = new BlindspotSpanProcessor(exporter, makeConfig({ errorAware: true }));
-    proc.onEnd(makeSpan());
-    proc.commitSession(0.5); // 0.4 < 0.5 → in sample → flush
-    await proc.forceFlush();
-    expect(exporter.exported).toHaveLength(1);
-    vi.restoreAllMocks();
-  });
-
-  it('drops session when random roll exceeds rate', async () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.9);
-    const exporter = makeExporter();
-    const proc = new BlindspotSpanProcessor(exporter, makeConfig({ errorAware: true }));
-    proc.onEnd(makeSpan());
-    proc.commitSession(0.5); // 0.9 > 0.5 → not in sample → drop
-    await proc.forceFlush();
-    expect(exporter.exported).toHaveLength(0);
-    vi.restoreAllMocks();
-  });
-
   it('routes consent-buffered spans through error-aware logic on grant', async () => {
-    const config = makeConfig({ errorAware: true, rate: 0 });
+    const config = makeConfig({ errorAware: true });
     config.privacy.consentRequired = true;
     const exporter = makeExporter();
-    const proc = new BlindspotSpanProcessor(exporter, config);
+    const proc = new BlindspotSpanProcessor(exporter, config, NOT_SAMPLED);
     proc.onEnd(makeSpan('before-consent'));
     // Grant consent — span moves to sessionBuffer (no error yet)
     proc.consentGate.grant();
-    proc.commitSession(0); // rate=0, no error → drop
+    proc.commitSession(); // unsampled, no error: drop
     await proc.forceFlush();
     expect(exporter.exported).toHaveLength(0);
   });
 
   it('consent-buffered error span triggers immediate flush on grant', async () => {
-    const config = makeConfig({ errorAware: true, rate: 0 });
+    const config = makeConfig({ errorAware: true });
     config.privacy.consentRequired = true;
     const exporter = makeExporter();
-    const proc = new BlindspotSpanProcessor(exporter, config);
+    const proc = new BlindspotSpanProcessor(exporter, config, NOT_SAMPLED);
     proc.onEnd(makeSpan('before-consent', SpanStatusCode.ERROR));
     proc.consentGate.grant(); // error span routes through _route → hasError = true → immediate flush
     await proc.forceFlush();
@@ -213,7 +194,7 @@ describe('BlindspotSpanProcessor — event redaction', () => {
     config.privacy = { ...config.privacy, ...privacy };
     const exporter = new InMemorySpanExporter();
     const provider = new BasicTracerProvider({
-      spanProcessors: [new BlindspotSpanProcessor(exporter, config)],
+      spanProcessors: [new BlindspotSpanProcessor(exporter, config, SAMPLED)],
     });
     const span = provider.getTracer('test').startSpan('op');
     record(span);

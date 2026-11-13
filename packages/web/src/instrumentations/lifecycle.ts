@@ -7,7 +7,7 @@ export function initLifecycle(_config: ResolvedConfig, beaconExporter: BeaconExp
   const flush = (): void => {
     suspendRouteSpan();
     if (_config.sampling.errorAware) {
-      getProcessor()?.commitSession(_config.sampling.rate);
+      getProcessor()?.commitSession();
     }
     beaconExporter.useBeaconForNextExport();
     void getProcessor()?.forceFlush();

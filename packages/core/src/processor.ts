@@ -31,7 +31,11 @@ export class BlindspotSpanProcessor implements SpanProcessor {
   private _hasError = false;
   private readonly _errorAware: boolean;
 
-  constructor(exporter: SpanExporter, private readonly _config: ResolvedConfig) {
+  constructor(
+    exporter: SpanExporter,
+    private readonly _config: ResolvedConfig,
+    private readonly _sessionSampled: boolean,
+  ) {
     this._batch = new BatchSpanProcessor(exporter);
     this._errorAware = _config.sampling.errorAware;
     this.consentGate = new ConsentGate();
@@ -84,12 +88,13 @@ export class BlindspotSpanProcessor implements SpanProcessor {
   }
 
   /**
-   * Called on page unload when errorAware is enabled.
-   * Exports the session buffer if an error was seen or the roll passes; otherwise drops it.
+   * Called when the page is hidden, when errorAware is enabled. Exports the
+   * buffered spans if an error was seen or the session is in the sample;
+   * otherwise drops them. The same session-level decision applies on every hide.
    */
-  commitSession(rate: number): void {
+  commitSession(): void {
     if (!this._errorAware) return;
-    if (this._hasError || Math.random() < rate) {
+    if (this._hasError || this._sessionSampled) {
       const spans = this._sessionBuffer.splice(0);
       for (const s of spans) this._batch.onEnd(s);
     } else {
