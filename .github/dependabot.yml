@@ -19,6 +19,11 @@ updates:
         update-types:
           - "minor"
           - "patch"
+    ignore:
+      # Types must match the Node runtime pinned in .nvmrc; a newer major
+      # would type-check APIs our runtime lacks. Bump it with .nvmrc.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
     commit-message:
       prefix: "chore(deps)"
       include: "scope"
@@ -31,6 +36,16 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
+    ignore:
+      # v2 requires the Changesets CLI v3 and renames our inputs; release.yml
+      # only runs on push to main, so PR CI cannot catch a broken bump. Migrate
+      # both together deliberately (see LEDGER.md).
+      - dependency-name: "changesets/action"
+        update-types: ["version-update:semver-major"]
+      # `@v4` already floats to every 4.x release; minor/patch PRs would only
+      # pin it to a tag, freezing updates without the benefit of a SHA pin.
+      - dependency-name: "github/codeql-action"
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
     commit-message:
       prefix: "chore(ci)"
     labels:
