@@ -7,3 +7,6 @@ dist/
 .DS_Store
 Thumbs.db
 coverage/
+# Playwright output, rewritten on every e2e run
+test-results/
+playwright-report/

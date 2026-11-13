@@ -153,3 +153,57 @@ test.describe('react-basic — error spans', () => {
     expect(exc!.attributes['exception.type']).toBe('Error');
   });
 });
+
+// ── Web vitals ─────────────────────────────────────────────────────────────────
+
+// web-vitals reports CLS and INP when the page is hidden, the same moment the SDK
+// ends the route span. Both must land on the span before it ends.
+test.describe('react-basic — web vitals', () => {
+  // layout-shift entries are Chromium-only, so CLS cannot be asserted elsewhere.
+  test.skip(({ browserName }) => browserName !== 'chromium', 'layout-shift is Chromium-only');
+
+  // web-vitals ignores interactions shorter than 40 ms when computing INP.
+  const SLOW_HANDLER_MS = 120;
+  const SHIFT_HEIGHT_PX = 200;
+
+  test('records CLS and INP on the route span when the page is hidden', async ({ page }) => {
+    await setupPage(page);
+    const otlp = installOtlpInterceptor(page);
+
+    await page.goto('/');
+    await page.evaluate(() => new Promise<void>((r) => requestAnimationFrame(() => setTimeout(r, 0))));
+
+    // Shift the rendered content down. It must happen before any input: shifts within
+    // 500 ms of an input are excluded from CLS.
+    await page.evaluate((height) => {
+      const spacer = document.createElement('div');
+      spacer.style.height = `${height}px`;
+      document.body.prepend(spacer);
+    }, SHIFT_HEIGHT_PX);
+    await page.evaluate(() => new Promise<void>((r) => requestAnimationFrame(() => setTimeout(r, 0))));
+
+    await page.evaluate((blockMs) => {
+      const button = document.createElement('button');
+      button.id = 'slow-interaction';
+      button.textContent = 'slow';
+      button.addEventListener('click', () => {
+        const until = performance.now() + blockMs;
+        while (performance.now() < until) {
+          // Block the main thread so the interaction is long enough to count.
+        }
+      });
+      document.body.append(button);
+    }, SLOW_HANDLER_MS);
+    await page.click('#slow-interaction');
+    await page.evaluate(() => new Promise<void>((r) => requestAnimationFrame(() => setTimeout(r, 0))));
+
+    await flushSpans(page);
+
+    const span = await otlp.waitForSpan(
+      (s) => s.name === 'navigation' && s.attributes['ux.route.to'] === '/',
+    );
+    const vitals = span.events.map((e) => e.name);
+    expect(vitals).toContain('cls');
+    expect(vitals).toContain('inp');
+  });
+});
