@@ -206,3 +206,4 @@ within minutes of installing the SDK. Demo-ability drives adoption.
 | Session = Trace, Route = root Span | Makes data natively queryable without custom tooling |
 | W3C `traceparent` propagation | Frontend-to-backend trace stitching, zero backend changes needed |
 | Low-cardinality span names (`navigation`, `click <tag>`, `{method}`); paths, labels and URLs only in attributes | `piiPatterns` redacts attribute values, never names, so any user text in a name would bypass it. Also OTel naming guidance: names group operations, attributes carry specifics |
+| A new trace per page load and per return to a hidden tab (`ux.route.trigger: resume`); never parent on the previous page's span | The route span is ended on hide, the last reliable export point on mobile, and sent by beacon, which can be lost. A child of a lost span shows as an orphan with no root. Reload continuation was tried and reverted for this reason |

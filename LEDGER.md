@@ -9,28 +9,6 @@ Severity: **high** (wrong data or privacy exposure), **medium** (misleading docs
 
 ---
 
-## L2: Reload trace continuation is dead code (high)
-
-**Where:** [`packages/web/src/context.ts`](packages/web/src/context.ts),
-[`packages/web/src/instrumentations/lifecycle.ts`](packages/web/src/instrumentations/lifecycle.ts)
-
-`saveRouteContextForReload()` has no production caller (only tests call it). The React,
-Vue, Svelte and Next integrations all call `loadRouteContextAfterReload()` on the initial
-route, but because nothing writes the key, it always returns `undefined`. Also,
-`lifecycle.ts` calls `clearRouteSpan()` on `pagehide`, so calling save *after* that would
-also find no route span. Vanilla `initRouting` never calls load either, so the
-integrations and the vanilla SDK disagree on intent.
-
-A related question: `visibilitychange → hidden` also ends the route span. After the tab
-becomes visible again there is no route span, so clicks and fetches start new **root**
-traces until the next navigation. Confirm whether this is intended.
-
-**Closed when:** a decision is recorded (continue traces across reloads, or not). If yes,
-save runs before the route span ends on `pagehide`, vanilla routing uses it too, and an
-integration test proves a reloaded page's route span shares the previous trace id. If
-no, delete both functions and their callers. Separately, either decide and test the
-tab-refocus behaviour or fix it.
-
 ## L3: ARCHITECTURE.md says "Session = Trace"; the code does Route = Trace (medium)
 
 **Where:** [`ARCHITECTURE.md`](ARCHITECTURE.md), the "Semantic Model" section and the

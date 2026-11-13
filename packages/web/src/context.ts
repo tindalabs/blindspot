@@ -3,6 +3,9 @@ import { context, trace } from '@opentelemetry/api';
 import { getTracer } from '@tindalabs/blindspot-core';
 
 let _routeSpan: Span | undefined;
+let _currentRoute: RouteChange | undefined;
+// The route whose span was ended because the page was hidden; resumed on return.
+let _suspendedRoute: RouteChange | undefined;
 let _routeContext: Context = context.active();
 let _lastInteractionLabel = '';
 
@@ -11,7 +14,8 @@ export function setRouteSpan(span: Span): void {
   _routeContext = trace.setSpan(context.active(), span);
 }
 
-export type RouteTrigger = 'initial' | 'user' | 'back-forward';
+/** 'resume': the page became visible again after its route span was ended on hide. */
+export type RouteTrigger = 'initial' | 'user' | 'back-forward' | 'resume';
 
 export interface RouteChange {
   from: string;
@@ -43,7 +47,33 @@ export function beginRouteSpan(route: RouteChange): Span {
     },
   );
   setRouteSpan(span);
+  _currentRoute = route;
   return span;
+}
+
+/**
+ * End the route span because the page is being hidden, remembering the route so
+ * resumeRouteSpan() can reopen it. The span must end here: mobile browsers often
+ * discard a hidden page without firing pagehide, so this is the last reliable
+ * moment to export it.
+ */
+export function suspendRouteSpan(): void {
+  if (!_routeSpan) return;
+  const route = _currentRoute;
+  clearRouteSpan();
+  _suspendedRoute = route;
+}
+
+/**
+ * Reopen the suspended route as a new trace when the page is visible again, so
+ * activity after returning nests under a route instead of each click and fetch
+ * becoming its own root trace.
+ */
+export function resumeRouteSpan(): void {
+  if (!_suspendedRoute || _routeSpan) return;
+  const { to } = _suspendedRoute;
+  _suspendedRoute = undefined;
+  beginRouteSpan({ from: to, to, trigger: 'resume' });
 }
 
 export function getRouteSpan(): Span | undefined {
@@ -58,6 +88,8 @@ export function clearRouteSpan(): void {
   _routeSpan?.end();
   _routeSpan = undefined;
   _routeContext = context.active();
+  _currentRoute = undefined;
+  _suspendedRoute = undefined;
 }
 
 export function setLastInteractionLabel(label: string): void {
@@ -82,5 +114,7 @@ export function getSessionTraceparent(): string | null {
 export function _resetContextForTesting(): void {
   _routeSpan = undefined;
   _routeContext = context.active();
+  _currentRoute = undefined;
+  _suspendedRoute = undefined;
   _lastInteractionLabel = '';
 }

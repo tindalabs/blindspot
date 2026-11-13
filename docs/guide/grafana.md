@@ -38,7 +38,10 @@ problem — something looks clickable but isn't.
 **Navigation Patterns** — every route transition in the selected window.
 Attributes: `ux.route.from` (previous path), `ux.route.to` (target path),
 `ux.route.trigger` (user / back-forward / initial). Use these to reconstruct
-user flows and identify exit points.
+user flows and identify exit points. The panel leaves out `resume` spans: when a
+user returns to a hidden tab, a new route span starts with
+`ux.route.trigger = "resume"` so later activity still nests under a route, but
+it is not a navigation.
 
 **API Calls — User-Perceived Latency** — all outbound fetch calls sorted by
 duration. `ux.api.user_wait_ms` is the time from the last interaction to the
@@ -66,7 +69,7 @@ You can modify or extend the queries directly in the panel editor.
 | Recent UX Sessions | `{}` |
 | Rage Clicks | `{span.ux.rage_click=true}` |
 | Dead Clicks | `{span.ux.dead_click=true}` |
-| Navigation Patterns | `{span:name=~"navigation.*"}` |
+| Navigation Patterns | `{span:name=~"navigation.*" && span.ux.route.trigger != "resume"}` |
 | API Calls | `{span.ux.api.user_wait_ms > 0}` |
 | Form Submissions | `{span:name=~"form.submit.*"}` |
 | JavaScript Errors | `{span:name=~"error.*"}` |

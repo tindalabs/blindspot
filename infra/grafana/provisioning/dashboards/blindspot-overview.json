@@ -128,7 +128,7 @@
         {
           "datasource": { "type": "tempo", "uid": "tempo" },
           "queryType": "traceql",
-          "query": "{span:name=~\"navigation.*\"}",
+          "query": "{span:name=~\"navigation.*\" && span.ux.route.trigger != \"resume\"}",
           "refId": "A",
           "limit": 50
         }
