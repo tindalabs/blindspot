@@ -26,6 +26,14 @@ updates:
         patterns:
           - "size-limit"
           - "@size-limit/*"
+      # react and react-dom must be the same version: Next refuses to build with
+      # a mismatch (PR #61 bumped react-dom to 19 alone). Their types follow them.
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
       # One PR per cycle for all other minor/patch bumps across the workspace.
       minor-and-patch:
         patterns:
