@@ -86,11 +86,10 @@ describe('initLifecycle — route span teardown', () => {
 });
 
 describe('initLifecycle — error-aware sampling', () => {
-  it('commits the session at the sampling rate when errorAware is enabled', () => {
+  it('commits the session on hide when errorAware is enabled', () => {
     sampling.errorAware = true;
-    sampling.rate = 0.25;
     hide();
-    expect(h.commitSession).toHaveBeenCalledWith(0.25);
+    expect(h.commitSession).toHaveBeenCalledOnce();
   });
 
   it('does not commit the session when errorAware is disabled', () => {

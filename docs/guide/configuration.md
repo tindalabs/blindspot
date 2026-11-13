@@ -60,7 +60,8 @@ init({
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `rate` | `number` | `1.0` | Fraction of sessions sampled (0–1). Head-based, decided at session start. |
+| `rate` | `number` | `1.0` | Fraction of sessions sampled (0 to 1). Decided from the session id, so a session is kept or dropped whole, and stays that way across reloads in the same tab. |
+| `errorAware` | `boolean` | `false` | Record every span and decide on each page hide: keep the session's spans if an error was seen or the session is in the `rate` sample, otherwise drop them. |
 
 ### `instrument`
 

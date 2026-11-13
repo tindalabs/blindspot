@@ -164,8 +164,13 @@ Two practical notes:
 A **Sampler** decides, when a span *starts*, whether it is recorded. This is **head
 sampling**: the decision is made before anyone knows how the operation turns out.
 
-- Default: `TraceIdRatioBasedSampler(rate)`. The decision is derived from the trace id,
-  so every span in the same trace gets the same answer and traces are never half-kept.
+- The usual choice is `TraceIdRatioBasedSampler(rate)`: the decision is derived from the
+  trace id, so every span in a trace gets the same answer and traces are never half-kept.
+- Blindspot cannot use it. With one trace per route, a per-trace decision keeps a random
+  share of each session's routes, so every session in the backend has silent gaps.
+  Instead `init.ts` decides once per session, from a hash of `ux.session.id`
+  (`sampling.ts`), and installs `AlwaysOnSampler` or `AlwaysOffSampler` for the page.
+  The lesson generalises: **sample on the unit you analyse.**
 
 Blindspot's `errorAware` mode shows the limit of head sampling. "Keep this session if
 an error happens later" cannot be decided at span start. So in that mode Blindspot
@@ -191,7 +196,7 @@ behaviours before spans reach it:
    are the redacted copies.
 2. **Consent gating.** Until consent is granted, ended spans are buffered, not exported.
 3. **Error-aware buffering.** In `errorAware` mode, spans wait until an error is seen
-   (then flush) or the page is hidden (then a sampling roll decides).
+   (then flush) or the page is hidden (then the session-level sample decides).
 
 This is a useful pattern to learn: **compose with the standard processor rather than
 reimplementing batching.**

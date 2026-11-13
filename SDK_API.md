@@ -61,7 +61,7 @@ init({
 | `privacy.blockSelectors` | `string[]` | `[]` | CSS selectors for elements to exclude entirely |
 | `privacy.piiPatterns` | `RegExp[]` | `[]` | Patterns stripped from all span and span-event attribute values |
 | `privacy.consentRequired` | `boolean` | `false` | Buffer spans until `grantConsent()` is called |
-| `sampling.rate` | `number` | `1.0` | Fraction of sessions to export (0–1) |
+| `sampling.rate` | `number` | `1.0` | Fraction of sessions to export (0 to 1), decided from the session id so a session is kept or dropped whole |
 | `instrument.*` | `boolean` | `true` | Toggle individual auto-instrumentations |
 
 ---
