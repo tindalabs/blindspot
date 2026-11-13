@@ -164,24 +164,6 @@ reporting on web-vitals 6, or keep page-level values and label them as such, for
 with an attribute), it is implemented with an e2e test that navigates between routes,
 and #62 is merged or closed to match.
 
-## L15: React 19 is allowed by the peer range but never tested (medium, needs a decision)
-
-**Where:** the `react: ">=18"` peer in [`packages/react/package.json`](packages/react/package.json)
-and [`packages/next/package.json`](packages/next/package.json); the React dev dependencies
-there and in [`examples/`](examples), all on 18.3
-
-The adapters promise React 18 and every later major, but the tests, examples and e2e
-only run on 18. A React 19 consumer is installing a combination we have never run.
-Dependabot now proposes react, react-dom and their types as one group (PR #61 bumped
-react-dom alone and broke the Next example build), so the next React 19 PR will look
-mergeable. Merging it would silently move all testing to 19 and leave 18 untested,
-while the peer range still claims it.
-
-**Closed when:** a decision is recorded (test both 18 and 19, or raise the floor to 19
-with a changeset, or cap the range at 18 until tested), the adapter tests and e2e run
-against every major the peer range allows, and the grouped Dependabot PR is merged or
-closed to match.
-
 ## L16: The release workflow is pinned to npm 11 (medium)
 
 **Where:** the "Upgrade npm for Trusted Publishing" step in
@@ -197,3 +179,19 @@ Publishing depends on the npm version.
 upgrade, which **verify** rather than assume), a dry run with the new npm major passes
 (`npm publish --dry-run` with the flags changesets uses), and the pin moves to that
 major.
+
+## L17: `react-router-dom` is imported but not declared as a peer (medium, needs a decision)
+
+**Where:** the `./react-router` entry of [`packages/react`](packages/react/package.json)
+(`src/react-router.tsx`), and [`docs/framework/react.md`](docs/framework/react.md)
+
+`peerDependenciesMeta` marks `react-router-dom` optional, but `peerDependencies` has no
+entry for it, so the meta does nothing and no version is declared. The subpath resolves
+in consumers only when their package manager happens to hoist the router; strict layouts
+such as Yarn PnP refuse the import. The docs promise React Router v6, while the dev
+dependency, the example and e2e run 7.
+
+**Closed when:** the supported router majors are decided (6 and 7, or 7 only) and
+measured, `react-router-dom` is declared as an optional peer with that range in a
+changeset, the docs state it, and every major in the range is tested, as for React (see
+the React 18 job in `ci.yml`).
