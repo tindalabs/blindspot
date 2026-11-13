@@ -19,6 +19,7 @@ export default defineConfig({
         text: 'Guide',
         items: [
           { text: 'Getting Started', link: '/guide/getting-started' },
+          { text: 'OTel Concepts', link: '/guide/otel-concepts' },
           { text: 'Configuration', link: '/guide/configuration' },
           { text: 'Privacy Model', link: '/guide/privacy' },
           { text: 'OTel Collector Setup', link: '/guide/collector' },
