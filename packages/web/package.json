@@ -78,7 +78,7 @@
     "@vitest/coverage-v8": "^5.1.0",
     "happy-dom": "^21.0.4",
     "size-limit": "^14.3.0",
-    "tsup": "^8.5.1",
+    "tsup": "^9.0.0",
     "typescript": "^5.7.0",
     "vitest": "^5.1.0"
   }
