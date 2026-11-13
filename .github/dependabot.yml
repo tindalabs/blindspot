@@ -1,8 +1,9 @@
 # Dependabot — keeps the toolchain fresh without flooding the queue.
 # Monthly cadence suits a project at this maturity; non-major bumps are grouped
 # into a single PR per cycle, while majors come through individually so they get
-# a proper review. `directory: /` covers the whole pnpm workspace via the root
-# lockfile. https://docs.github.com/en/code-security/dependabot/dependabot-version-updates
+# a proper review, except for the lockstep families grouped below.
+# `directory: /` covers the whole pnpm workspace via the root lockfile.
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates
 
 version: 2
 updates:
@@ -11,8 +12,21 @@ updates:
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 5
-    # One PR per cycle for all minor/patch bumps across the workspace.
+    # Dependabot puts a dependency in the first group that matches, so the
+    # lockstep families come first. Each family releases in lockstep with
+    # exact-version peers; a major taken one package at a time breaks it
+    # (PR #50 bumped vitest without @vitest/coverage-v8, which broke coverage).
+    # These groups cover every update type, majors included.
     groups:
+      vitest:
+        patterns:
+          - "vitest"
+          - "@vitest/*"
+      size-limit:
+        patterns:
+          - "size-limit"
+          - "@size-limit/*"
+      # One PR per cycle for all other minor/patch bumps across the workspace.
       minor-and-patch:
         patterns:
           - "*"
