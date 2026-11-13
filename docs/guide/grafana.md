@@ -17,21 +17,24 @@ The dashboard is organized into four collapsible row sections.
 
 ### User Sessions
 
-**Recent UX Sessions** — all traces in the selected time range. Each row is one
-session (page load through last interaction). Click any row to open the full
-waterfall — route spans, click spans, API calls, and Web Vitals. No PII is
-ever shown.
+**Recent Routes**: every route in the selected time range. Each route is its own
+trace, so each row is one route (its navigation span). Click a row to open that
+route's waterfall: click spans, API calls, and Web Vitals. No PII is ever shown.
+
+A session is all the routes that share the `ux.session.id` resource attribute.
+Pick one in the **Session** filter at the top of the dashboard to narrow every
+panel to a single browser tab's journey.
 
 ### Interaction Quality
 
-**Rage Clicks — User Frustration** — sessions where a user clicked the same
-element three or more times within 500 ms. A rage click means the user expected
+**Rage Clicks: User Frustration**: clicks that were part of three or more clicks on
+the same element within 500 ms. A rage click means the user expected
 a response and didn't get one. Attributes: `ux.element.label`, `ux.element.tag`,
 `ux.element.role`.
 
-**Dead Clicks — Broken Affordances** — sessions where a user clicked a
-non-interactive element (div, span, p, img, etc.). Indicates a visual affordance
-problem — something looks clickable but isn't.
+**Dead Clicks: Broken Affordances**: clicks on a non-interactive element (div, span,
+p, img, etc.). Indicates a visual affordance problem: something looks clickable but
+isn't.
 
 ### Navigation & API
 
@@ -66,13 +69,15 @@ You can modify or extend the queries directly in the panel editor.
 
 | Panel | TraceQL |
 |---|---|
-| Recent UX Sessions | `{}` |
-| Rage Clicks | `{span.ux.rage_click=true}` |
-| Dead Clicks | `{span.ux.dead_click=true}` |
-| Navigation Patterns | `{span:name=~"navigation.*" && span.ux.route.trigger != "resume"}` |
-| API Calls | `{span.ux.api.user_wait_ms > 0}` |
-| Form Submissions | `{span:name=~"form.submit.*"}` |
-| JavaScript Errors | `{span:name=~"error.*"}` |
+| Recent Routes | `{span:name=~"navigation.*" && resource.ux.session.id=~"$sessionId"}` |
+| Rage Clicks | `{span.ux.rage_click=true && resource.ux.session.id=~"$sessionId"}` |
+| Dead Clicks | `{span.ux.dead_click=true && resource.ux.session.id=~"$sessionId"}` |
+| Navigation Patterns | `{span:name=~"navigation.*" && span.ux.route.trigger != "resume" && resource.ux.session.id=~"$sessionId"}` |
+| API Calls | `{span.ux.api.user_wait_ms > 0 && resource.ux.session.id=~"$sessionId"}` |
+| Form Submissions | `{span:name=~"form.submit.*" && resource.ux.session.id=~"$sessionId"}` |
+| JavaScript Errors | `{span:name=~"error.*" && resource.ux.session.id=~"$sessionId"}` |
+
+`$sessionId` is the Session filter. Its **All** value is `.*`, which matches every session.
 
 ## Alerting on errors
 
