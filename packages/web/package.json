@@ -70,7 +70,7 @@
     "@opentelemetry/sdk-trace-web": "^2.7.1",
     "@size-limit/file": "^12.1.0",
     "@vitest/coverage-v8": "^4.1.8",
-    "happy-dom": "^20.10.1",
+    "happy-dom": "^21.0.4",
     "size-limit": "^12.1.0",
     "tsup": "^8.5.1",
     "typescript": "^5.7.0",
