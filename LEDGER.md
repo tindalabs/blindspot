@@ -100,10 +100,15 @@ is removed in the same PR.
 
 Main is on the latest 15.5.x. Next 16 is a major release of a peer dependency, so
 supporting it is a product decision (widen the peer range, test both, or drop 15), not a
-lockfile bump. Dependabot PR #36 was closed for this reason.
+lockfile bump. Dependabot PRs #36 and #70 were closed for this reason, and Dependabot now
+ignores Next majors.
 
-**Closed when:** the decision is recorded, the peer range reflects it, and the adapter
-tests and e2e run against every supported major.
+The peer range is already wider than what we test: `next: ">=13"` promises 13, 14, 16
+and every later major, while the tests, the example and e2e only run on 15.
+
+**Closed when:** the decision is recorded, the peer range reflects it, the adapter
+tests and e2e run against every supported major, and the Dependabot ignore for Next
+majors is removed (or kept with the reason updated) in the same PR.
 
 ## L11: TypeScript 6 (low)
 

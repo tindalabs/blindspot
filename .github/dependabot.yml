@@ -46,6 +46,11 @@ updates:
       # would type-check APIs our runtime lacks. Bump it with .nvmrc.
       - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
+      # A Next major changes which versions the adapter supports, a product
+      # decision rather than a lockfile bump (Dependabot PRs #36 and #70). Lift
+      # this when the supported range is decided (see LEDGER.md).
+      - dependency-name: "next"
+        update-types: ["version-update:semver-major"]
       # The OTLP exporter 0.300+ is built on OTel JS SDK 3 and needs api 1.10+,
       # while sdk-trace-web is still on SDK 2 (which needs api < 1.10). Mixing
       # the lines breaks peers and bundles two SDKs. Lift these with the SDK 3

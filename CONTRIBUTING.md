@@ -4,7 +4,7 @@ Thank you for your interest in contributing! This document covers everything you
 
 ## Development setup
 
-Blindspot is a pnpm monorepo managed with Turborepo. Node.js ≥ 18 and pnpm ≥ 9 are required.
+Blindspot is a pnpm monorepo managed with Turborepo. Node.js 22.18 or later (see `.nvmrc`) and pnpm 9 or later are required.
 
 ```bash
 git clone <repo-url>
