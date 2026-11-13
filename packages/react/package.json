@@ -1,7 +1,7 @@
 {
   "name": "@tindalabs/blindspot-react",
   "version": "0.2.0",
-  "description": "Blindspot — React integration. BlindspotProvider, BlindspotRoutes, and useSpan hook for React 18+ applications.",
+  "description": "Blindspot — React integration. BlindspotProvider, BlindspotRoutes, and useSpan hook for React 18 and 19 applications.",
   "keywords": [
     "opentelemetry",
     "observability",
@@ -76,7 +76,7 @@
     "@opentelemetry/api": "^1.9.1"
   },
   "peerDependencies": {
-    "react": ">=18"
+    "react": "^18 || ^19"
   },
   "peerDependenciesMeta": {
     "react-router-dom": {
@@ -85,12 +85,12 @@
   },
   "devDependencies": {
     "@testing-library/react": "^16.0.0",
-    "@types/react": "^18.3.1",
-    "@types/react-dom": "^18.3.1",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "@vitest/coverage-v8": "^5.1.0",
     "happy-dom": "^21.0.4",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "react-router-dom": "^7.17.0",
     "tsup": "^9.0.0",
     "typescript": "^5.7.0",

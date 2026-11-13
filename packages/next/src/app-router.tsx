@@ -13,8 +13,8 @@ export function BlindspotAppRouter() {
   useEffect(() => {
     const to = pathname + search;
 
-    // React 18 StrictMode double-invokes effects. Skip if path unchanged and not
-    // the initial render — we already created the span for this route.
+    // StrictMode (React 18 and later) double-invokes effects. Skip if path unchanged
+    // and not the initial render: we already created the span for this route.
     if (prevPath.current !== null && prevPath.current === to) return;
 
     const from = prevPath.current ?? '';

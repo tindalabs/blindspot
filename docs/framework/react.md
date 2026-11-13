@@ -10,6 +10,8 @@ a generic hook for TanStack Router and other routers.
 npm install @tindalabs/blindspot-react @tindalabs/blindspot
 ```
 
+Requires React 18 or 19.
+
 ## Provider
 
 Wrap your app root with `<BlindspotProvider>`. It initialises the SDK once on
@@ -122,7 +124,7 @@ is active (e.g. before the first navigation).
 ## Full example
 
 See [`examples/react-basic/`](https://github.com/blindspot/blindspot/tree/main/examples/react-basic)
-for a working Vite + React 18 + React Router v6 demo app.
+for a working Vite + React 19 + React Router 7 demo app.
 
 ```bash
 cd examples/react-basic

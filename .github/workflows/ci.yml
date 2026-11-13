@@ -100,3 +100,66 @@ jobs:
           name: playwright-report-${{ matrix.os }}
           path: e2e/playwright-report
           retention-days: 7
+
+  # The react and next adapters declare `react: ^18 || ^19`, but the workspace
+  # develops on 19, so every other job runs 19 only. This job forces 18 across
+  # the workspace and reruns what React touches: a 19-only API in an adapter
+  # passes everywhere else and fails here.
+  react-18:
+    name: react 18
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 9.15.4
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+          cache: pnpm
+
+      # Overrides replace React for every consumer at once (adapters, examples,
+      # and their transitive peers), which per-package `pnpm add` would not.
+      - name: Install dependencies with React 18
+        run: |
+          pnpm pkg set 'pnpm.overrides.react=^18.3.1' 'pnpm.overrides.react-dom=^18.3.1' \
+            'pnpm.overrides.@types/react=^18.3.1' 'pnpm.overrides.@types/react-dom=^18.3.1'
+          pnpm install --no-frozen-lockfile
+
+      # Without this, an override that stopped applying would leave the job
+      # testing 19 again while still passing.
+      - name: Assert React 18 is what resolved
+        run: |
+          for consumer in packages/react packages/next examples/react-basic examples/next-app-router; do
+            for dep in react react-dom @types/react @types/react-dom; do
+              version=$(node -p "require(require.resolve('$dep/package.json', { paths: ['$consumer'] })).version")
+              echo "$consumer: $dep@$version"
+              case "$version" in 18.*) ;; *) echo "::error::$consumer resolved $dep@$version, expected 18.x"; exit 1 ;; esac
+            done
+          done
+
+      - name: Build
+        run: pnpm build
+
+      # Type-check matters as much as tests: @types/react 19 accepts APIs that
+      # 18 lacks, and consumers compile the adapters' .d.ts against their own.
+      - name: Type check and test the React adapters
+        run: pnpm turbo type-check test --filter=@tindalabs/blindspot-react --filter=@tindalabs/blindspot-next
+
+      - name: Install browsers
+        run: pnpm --filter @tindalabs/blindspot-e2e exec playwright install --with-deps chromium firefox
+
+      # The React and Next suites; Vue does not use React. WebKit stays in the
+      # macOS job: it tests an engine, not a React version.
+      - name: Run e2e
+        run: pnpm e2e --project=react --project=react-firefox --project=next
+
+      - name: Upload report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report-react-18
+          path: e2e/playwright-report
+          retention-days: 7

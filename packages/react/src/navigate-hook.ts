@@ -11,8 +11,8 @@ export function useBlindspotNavigate(
   useEffect(() => {
     const to = pathname + search;
 
-    // React 18 StrictMode double-invokes effects. If the path hasn't changed and
-    // this isn't the initial render, we've already created the span — skip.
+    // StrictMode (React 18 and later) double-invokes effects. If the path hasn't
+    // changed and this isn't the initial render, we've already created the span, so skip.
     if (prevPath.current !== null && prevPath.current === to) return;
 
     const from = prevPath.current ?? '';

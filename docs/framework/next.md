@@ -10,6 +10,8 @@ stub), and support for both App Router and Pages Router.
 npm install @tindalabs/blindspot-next @tindalabs/blindspot
 ```
 
+Requires React 18 or 19.
+
 ## App Router
 
 ### Provider
