@@ -121,7 +121,8 @@ surfaces on TypeScript 6, or a reason to stay on 5.x is recorded here.
 **Where:** the `@opentelemetry/*` dependencies in
 [`packages/core/package.json`](packages/core/package.json) and
 [`packages/web/package.json`](packages/web/package.json), and the Dependabot holds on
-`exporter-trace-otlp-http` (0.300+) and `api` (1.10+)
+`exporter-trace-otlp-http` (0.300+), `api` (1.10+), and the majors of `core`,
+`resources`, `sdk-trace-base` and `sdk-trace-web`
 
 The OTLP exporter 0.300+ is built on SDK 3 and requires `@opentelemetry/api` ^1.10, but
 `sdk-trace-web` has no stable 3.x yet and its 2.x line rejects api 1.10. We stay on the
@@ -134,5 +135,5 @@ every consumer, so it needs a changeset that says so.
 
 **Closed when:** a stable `sdk-trace-web` 3 exists, all OTel packages move to the SDK 3
 line together, imports use `@opentelemetry/sdk-trace` instead of `sdk-trace-base`, the
-consumer-facing api peer change is in a changeset, and both Dependabot holds are removed
-in the same PR.
+consumer-facing api peer change is in a changeset, and all the OTel Dependabot holds are
+removed in the same PR.
