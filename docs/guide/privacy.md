@@ -23,7 +23,7 @@ not their content.
 - **DOM content** — no text content, no DOM snapshots, no screenshots
 - **Query strings** — stripped from URLs and error stack traces before export
 - **File paths** — stripped from error stack traces
-- **PII patterns** — configurable regex list applied to all attribute values
+- **PII patterns** — configurable regex list applied to all span and span-event attribute values
 
 ## Privacy layers
 
@@ -179,7 +179,7 @@ batch exporter sends data. The export pipeline is:
 ```
 Interaction
   → Span created with raw attributes
-  → Privacy engine scrubs piiPatterns from attribute values
+  → Privacy engine scrubs piiPatterns from span and event attribute values
   → Selector/input blocking checked — span dropped if matched
   → Consent gate checked — span buffered if consentRequired=true
   → BatchSpanProcessor queues span

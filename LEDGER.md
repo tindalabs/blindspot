@@ -9,26 +9,6 @@ Severity: **high** (wrong data or privacy exposure), **medium** (misleading docs
 
 ---
 
-## L1: Privacy redactor skips span events (high)
-
-**Where:** [`packages/core/src/processor.ts`](packages/core/src/processor.ts) (`sanitizedView`),
-[`packages/web/src/instrumentations/errors.ts`](packages/web/src/instrumentations/errors.ts),
-[`packages/web/src/instrumentations/fetch.ts`](packages/web/src/instrumentations/fetch.ts)
-
-`sanitizedView` replaces only `span.attributes`. Span `events` reach the exporter
-unredacted. `errors.ts` puts `exception.message` in an event and only strips URLs and file
-paths, so a configured `piiPatterns` entry (an email, say) in an error message is
-exported. `fetch.ts` calls `span.recordException(err)`, which writes `exception.message`
-and `exception.stacktrace` as event attributes with no sanitization at all. Span **names**
-are also unredacted (click spans embed the element label).
-
-**Why it matters:** "No PII" is the product's core claim, and `piiPatterns` gives users a
-guarantee the code does not keep.
-
-**Closed when:** the processor sanitizes event attributes (and decides a policy for span
-names), with regression tests that fail today: a `piiPatterns` match in an unhandled
-error message, and in a `fetch` network-error exception, must be redacted on export.
-
 ## L2: Reload trace continuation is dead code (high)
 
 **Where:** [`packages/web/src/context.ts`](packages/web/src/context.ts),

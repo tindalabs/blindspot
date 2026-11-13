@@ -82,4 +82,14 @@ describe('sanitizeAttributes', () => {
     const attrs = { key: 'value' };
     expect(sanitizeAttributes(attrs, base)).toBe(attrs);
   });
+
+  it('redacts every match of a global (/g) pattern, not every other one', () => {
+    // RegExp#test on a /g pattern advances lastIndex, so a stateful check would
+    // miss the second of two consecutive matching values.
+    const email = /[\w.+-]+@[\w-]+\.\w{2,}/g;
+    const attrs = { first: 'a@example.com', second: 'b@example.com' };
+    const result = sanitizeAttributes(attrs, { ...base, piiPatterns: [email] });
+    expect(result['first']).toBe('[redacted]');
+    expect(result['second']).toBe('[redacted]');
+  });
 });

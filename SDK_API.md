@@ -59,7 +59,7 @@ init({
 | `serviceName` | `string` | — | Identifies your app in traces |
 | `privacy.maskInputs` | `boolean` | `true` | Block all input content from being captured |
 | `privacy.blockSelectors` | `string[]` | `[]` | CSS selectors for elements to exclude entirely |
-| `privacy.piiPatterns` | `RegExp[]` | `[]` | Patterns stripped from all attribute values |
+| `privacy.piiPatterns` | `RegExp[]` | `[]` | Patterns stripped from all span and span-event attribute values |
 | `privacy.consentRequired` | `boolean` | `false` | Buffer spans until `grantConsent()` is called |
 | `sampling.rate` | `number` | `1.0` | Fraction of sessions to export (0–1) |
 | `instrument.*` | `boolean` | `true` | Toggle individual auto-instrumentations |
