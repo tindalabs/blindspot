@@ -1,6 +1,6 @@
 {
   "name": "@tindalabs/blindspot",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Blindspot — privacy-first auto-instrumentation for browsers. Captures Web Vitals, custom spans, and user events with built-in PII filtering.",
   "keywords": [
     "opentelemetry",
