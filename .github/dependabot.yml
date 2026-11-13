@@ -32,6 +32,16 @@ updates:
         versions: [">=0.300.0"]
       - dependency-name: "@opentelemetry/api"
         versions: [">=1.10.0"]
+      # The stable SDK packages move to 3.x as one line. Taking any of them alone
+      # pairs SDK 3 internals with the SDK 2 sdk-trace-web (Dependabot PR #49).
+      - dependency-name: "@opentelemetry/core"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@opentelemetry/resources"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@opentelemetry/sdk-trace-base"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@opentelemetry/sdk-trace-web"
+        update-types: ["version-update:semver-major"]
     commit-message:
       prefix: "chore(deps)"
       include: "scope"
