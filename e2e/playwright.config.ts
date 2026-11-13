@@ -44,10 +44,11 @@ export default defineConfig({
     // ── WebKit (Safari engine) ─────────────────────────────────────────────────
     // Playwright WebKit on Linux cannot reach Vite dev servers ("internal error"),
     // so this project exists only on macOS, where CI runs it in its own job.
+    // Use localhost, not 127.0.0.1: on macOS Vite binds `localhost` to ::1 only.
     ...(process.platform === 'darwin' ? [{
       name: 'react-webkit',
       testMatch: 'react.spec.ts',
-      use: { ...devices['Desktop Safari'], baseURL: 'http://127.0.0.1:5175' },
+      use: { ...devices['Desktop Safari'], baseURL: 'http://localhost:5175' },
     }] : []),
   ],
   webServer: [
