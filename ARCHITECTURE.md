@@ -36,7 +36,7 @@ enrichment, opinionated defaults, and framework integrations.
 │  │  │           @tindalabs/blindspot-core               │   │   │
 │  │  │                                         │   │   │
 │  │  │  OTel TracerProvider (sdk-trace-web)    │   │   │
-│  │  │  Session context propagation            │   │   │
+│  │  │  Session id (resource attribute)        │   │   │
 │  │  │  Semantic attribute enrichment          │   │   │
 │  │  │  Sampler                                │   │   │
 │  │  └────────────────────┬────────────────────┘   │   │
@@ -62,24 +62,29 @@ enrichment, opinionated defaults, and framework integrations.
 
 ## The Semantic Model
 
-A user session maps to a **Trace**. The current route is a **root Span**. Every
-interaction within that route is a **child Span**. This is the core semantic
-decision that makes Blindspot data natively queryable in any OTel backend.
+Each **route** is a **Trace**: the route span is its root, and every interaction on
+that route is a **child Span**. A user session is many traces, joined by the
+`ux.session.id` **resource** attribute that every span in the tab carries. This is the
+core semantic decision that makes Blindspot data natively queryable in any OTel backend.
 
 ```
-Trace (session)
-│
-├── Span: navigation → /checkout          ← root span per route
-│   ├── Span: click "Add to cart"
-│   ├── Span: POST  (url.full /api/cart)  ← correlated with backend via traceparent
-│   │     └── Event: response.error (429)
-│   ├── Span: click "Retry"
-│   └── Span: POST  (url.full /api/cart, success)
-│
-└── Span: navigation → /order-confirm
-    └── Span: page.load
-          └── Event: lcp (1.2s)
+Trace (one per route)
+└── Span: navigation                  ux.route.to=/checkout   ← root span
+    ├── Span: click button            ux.element.label="Add to cart"
+    ├── Span: POST                    url.full=/api/cart      ← correlated with backend via traceparent
+    │                                 http.response.status_code=429, status ERROR
+    ├── Span: click button            ux.element.label="Retry"
+    └── Span: POST                    url.full=/api/cart      (200)
+
+Next trace (same session: same ux.session.id resource attribute)
+└── Span: navigation                  ux.route.to=/order-confirm
+      (event: lcp, web_vital.value=1200)
 ```
+
+A trace is meant to describe one bounded operation. A trace that lasted a whole session
+would never complete, would exceed backend limits on trace size and duration, and would
+make every backend request a descendant of one giant tree. To see a session, filter by
+`resource.ux.session.id`; to see one route, open its trace.
 
 The `traceparent` W3C header is injected automatically into every fetch call,
 so the backend trace (in any language) becomes a child of the frontend span.
@@ -92,6 +97,15 @@ Frontend and backend are visible as a single trace in Tempo or Jaeger.
 OTel Semantic Conventions are used where they apply. UX-specific attributes
 live under the `ux.*` namespace.
 
+### Resource (on every span)
+
+```json
+{
+  "service.name": "storefront",
+  "ux.session.id": "s_abc123"
+}
+```
+
 ### Route span
 
 ```json
@@ -101,14 +115,18 @@ live under the `ux.*` namespace.
     "ux.route.from": "/cart",
     "ux.route.to": "/checkout",
     "ux.route.trigger": "user",
-    "ux.session.id": "s_abc123",
-    "ux.viewport.width": 1440,
-    "ux.viewport.height": 900,
-    "http.url": "https://app.example.com/checkout",
-    "service.name": "storefront"
-  }
+    "url.full": "https://app.example.com/checkout"
+  },
+  "events": [
+    { "name": "lcp", "attributes": { "web_vital.value": 1200 } }
+  ]
 }
 ```
+
+`ux.route.trigger` is one of `initial`, `user`, `back-forward`, or `resume` (the page
+became visible again after its route span ended on hide). `url.full` is set by the
+built-in History API routing; the framework adapters set only the `ux.route.*`
+attributes. Web Vitals (`lcp`, `cls`, `inp`) are events on the route span.
 
 ### Interaction span
 
@@ -132,22 +150,18 @@ live under the `ux.*` namespace.
 ```json
 {
   "name": "POST",
+  "status": { "code": "ERROR", "message": "HTTP 422" },
   "attributes": {
-    "http.method": "POST",
-    "http.url": "/api/orders",
-    "http.status_code": 422,
+    "http.request.method": "POST",
+    "url.full": "/api/orders",
+    "http.response.status_code": 422,
     "ux.api.user_wait_ms": 1840,
     "ux.api.triggered_by": "Place Order"
-  },
-  "events": [
-    { "name": "request.sent" },
-    {
-      "name": "response.received",
-      "attributes": { "status": 422, "body.hint": "validation_failed" }
-    }
-  ]
+  }
 }
 ```
+
+Any response with status 400 or above sets the span status to `ERROR`.
 
 ---
 
@@ -203,7 +217,7 @@ within minutes of installing the SDK. Demo-ability drives adoption.
 | Wrap `@opentelemetry/instrumentation-fetch` | Backend correlation comes for free |
 | Wrap `@opentelemetry/instrumentation-user-interaction` | Baseline click/event capture exists |
 | OTLP/HTTP JSON transport | Most browser-compatible; works with any collector |
-| Session = Trace, Route = root Span | Makes data natively queryable without custom tooling |
+| Route = Trace (route span is the root); session = the `ux.session.id` resource attribute | A trace describes one bounded operation. A session-long trace never completes and breaks backend trace-size and duration limits; a resource attribute groups a session's traces in any OTel backend without custom tooling |
 | W3C `traceparent` propagation | Frontend-to-backend trace stitching, zero backend changes needed |
 | Low-cardinality span names (`navigation`, `click <tag>`, `{method}`); paths, labels and URLs only in attributes | `piiPatterns` redacts attribute values, never names, so any user text in a name would bypass it. Also OTel naming guidance: names group operations, attributes carry specifics |
 | A new trace per page load and per return to a hidden tab (`ux.route.trigger: resume`); never parent on the previous page's span | The route span is ended on hide, the last reliable export point on mobile, and sent by beacon, which can be lost. A child of a lost span shows as an orphan with no root. Reload continuation was tried and reverted for this reason |
