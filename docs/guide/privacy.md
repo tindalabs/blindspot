@@ -157,15 +157,16 @@ All three cases are detected and suppressed automatically.
 
 ## Label annotation
 
-Blindspot uses element labels for span names rather than DOM text content (which
-may contain PII). Use `data-blindspot-label` to set an explicit, safe label:
+Click spans record the element's label in the `ux.element.label` attribute. The
+derived label comes from accessible names and text content, which may contain PII.
+Use `data-blindspot-label` to set an explicit, safe label:
 
 ```html
-<!-- Without annotation — span name would be "click button[Place Order — $49.99]" -->
-<button>Place Order — $49.99</button>
+<!-- Without annotation: ux.element.label is "Place Order $49.99" -->
+<button>Place Order $49.99</button>
 
-<!-- With annotation — span name is "click button[submit-order]" -->
-<button data-blindspot-label="submit-order">Place Order — $49.99</button>
+<!-- With annotation: ux.element.label is "submit-order" -->
+<button data-blindspot-label="submit-order">Place Order $49.99</button>
 ```
 
 This is especially useful for buttons and links whose visible text changes by
@@ -186,4 +187,24 @@ Interaction
   → OTLP/HTTP exporter sends batch to collector
 ```
 
-The collector never sees unredacted data.
+The collector never sees unredacted attribute values.
+
+### Span names
+
+`piiPatterns` applies to attribute values, not span names, so auto-instrumented
+span names never contain user-visible text or URLs:
+
+| Span | Name | Where the specifics live |
+|---|---|---|
+| Route | `navigation` | `ux.route.from`, `ux.route.to`, `url.full` |
+| Click | `click <tag>`, e.g. `click button` | `ux.element.label` |
+| Fetch | the HTTP method, e.g. `GET` | `url.full` |
+| Form submit | `form.submit <form name or id>` | `ux.form.*` |
+| Errors | `error.unhandled`, `error.unhandled_rejection` | `exception` event |
+
+This also follows OpenTelemetry's naming guidance: span names should be
+low-cardinality, with the specific values in attributes.
+
+Form span names use the form's `name` or `id` attribute, with generated
+segments removed. These are developer-authored, so keep them free of user data.
+The same applies to names you pass to `useSpan` or `recordEvent`.

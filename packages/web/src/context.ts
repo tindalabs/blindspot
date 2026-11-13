@@ -1,5 +1,6 @@
 import type { Context, Span, SpanContext } from '@opentelemetry/api';
 import { context, trace } from '@opentelemetry/api';
+import { getTracer } from '@tindalabs/blindspot-core';
 
 const RELOAD_CTX_KEY = 'blindspot.reload_ctx';
 
@@ -10,6 +11,41 @@ let _lastInteractionLabel = '';
 export function setRouteSpan(span: Span): void {
   _routeSpan = span;
   _routeContext = trace.setSpan(context.active(), span);
+}
+
+export type RouteTrigger = 'initial' | 'user' | 'back-forward';
+
+export interface RouteChange {
+  from: string;
+  to: string;
+  trigger: RouteTrigger;
+}
+
+// Span names must be low-cardinality: route paths can carry identifiers (and PII,
+// which redaction only removes from attribute values), so they live in ux.route.*
+// attributes, never in the name.
+const NAVIGATION_SPAN_NAME = 'navigation';
+
+/**
+ * End the current route span and start the next one as the new route span.
+ * Without a parentContext the route opens a new trace, which is the normal case:
+ * one trace per route.
+ */
+export function beginRouteSpan(route: RouteChange, parentContext?: Context): Span {
+  clearRouteSpan();
+  const span = getTracer().startSpan(
+    NAVIGATION_SPAN_NAME,
+    {
+      attributes: {
+        'ux.route.from': route.from,
+        'ux.route.to': route.to,
+        'ux.route.trigger': route.trigger,
+      },
+    },
+    parentContext,
+  );
+  setRouteSpan(span);
+  return span;
 }
 
 export function getRouteSpan(): Span | undefined {

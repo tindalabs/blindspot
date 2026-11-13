@@ -2,17 +2,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render } from '@testing-library/react';
 
 const mockInit = vi.hoisted(() => vi.fn());
-const mockStartSpan = vi.hoisted(() =>
-  vi.fn().mockReturnValue({ end: vi.fn(), setAttribute: vi.fn(), addEvent: vi.fn() }),
-);
 
 vi.mock('@tindalabs/blindspot', () => ({
   init: mockInit,
-  setRouteSpan: vi.fn(),
+  beginRouteSpan: vi.fn(),
   clearRouteSpan: vi.fn(),
   getRouteSpan: vi.fn(),
   getRouteContext: vi.fn(),
-  getTracer: vi.fn().mockReturnValue({ startSpan: mockStartSpan }),
   loadRouteContextAfterReload: vi.fn().mockReturnValue(undefined),
 }));
 

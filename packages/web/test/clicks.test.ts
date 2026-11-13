@@ -30,7 +30,8 @@ describe('initClicks', () => {
     click(btn);
     const spans = exporter.getFinishedSpans();
     expect(spans.length).toBe(1);
-    expect(spans[0].name).toContain('click button');
+    // Low-cardinality name: the label lives in ux.element.label, where redaction applies.
+    expect(spans[0].name).toBe('click button');
   });
 
   it('records element tag, label, and interaction type', () => {
@@ -90,15 +91,15 @@ describe('initClicks', () => {
     expect(exporter.getFinishedSpans().length).toBe(0);
   });
 
-  it('uses data-blindspot-label over text content in the span name', () => {
+  it('uses data-blindspot-label over text content as the element label', () => {
     const btn = document.createElement('button');
     btn.setAttribute('data-blindspot-label', 'submit-order');
     btn.textContent = 'Place Order — $49.99';
     document.body.appendChild(btn);
     click(btn);
     const [span] = exporter.getFinishedSpans();
-    expect(span.name).toContain('submit-order');
-    expect(span.name).not.toContain('$49.99');
+    expect(span.attributes['ux.element.label']).toBe('submit-order');
+    expect(span.name).toBe('click button');
   });
 
   it.each(['password', 'email', 'tel'])('skips clicks on input[type=%s]', (type) => {

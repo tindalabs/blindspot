@@ -42,7 +42,9 @@ export function initClicks(config: ResolvedConfig): void {
       const tag = target.tagName.toLowerCase();
 
       const span = getTracer().startSpan(
-        `click ${tag}${label ? `[${label}]` : ''}`,
+        // The label stays out of the name: it is user-visible text, so it belongs in
+        // ux.element.label, where piiPatterns redaction applies.
+        `click ${tag}`,
         {
           attributes: {
             'ux.interaction.type': 'click',

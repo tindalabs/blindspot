@@ -214,9 +214,9 @@ Spans emitted automatically when their instrumentation is enabled.
 
 | Instrumentation | Span name pattern | Key attributes |
 |---|---|---|
-| `routing` | `navigation {from} → {to}` | `ux.route.from`, `ux.route.to`, `ux.route.trigger` |
-| `clicks` | `click {tag}[{label}]` | `ux.interaction.type`, `ux.element.label`, `ux.rage_click`, `ux.dead_click` |
+| `routing` | `navigation` | `ux.route.from`, `ux.route.to`, `ux.route.trigger` |
+| `clicks` | `click {tag}` | `ux.interaction.type`, `ux.element.label`, `ux.rage_click`, `ux.dead_click` |
 | `forms` | `form.submit {name}` | `ux.form.name`, `ux.form.valid`, `ux.form.attempts` |
-| `fetch` | `{METHOD} {path}` | `http.method`, `http.url`, `http.status_code`, `ux.api.user_wait_ms` |
+| `fetch` | `{METHOD}` | `http.request.method`, `url.full`, `http.response.status_code`, `ux.api.user_wait_ms`, `ux.api.triggered_by` |
 | `vitals` | Events on route span | `lcp`, `cls`, `inp` values as span events |
 | `errors` | `error.unhandled` | `error.type`, `error.message`, `error.stack` (sanitized) |

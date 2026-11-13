@@ -93,6 +93,14 @@ describe('initRouting', () => {
     expect(about?.attributes['ux.route.trigger']).toBe('user');
   });
 
+  it('names route spans "navigation" and keeps the paths in attributes', () => {
+    history.pushState({}, '', '/users/42');
+    history.pushState({}, '', '/users/43'); // ends /users/42
+    const route = exporter.getFinishedSpans().find((s) => s.attributes['ux.route.to'] === '/users/42');
+    expect(route?.name).toBe('navigation');
+    expect(route?.attributes['url.full']).toBe(`${location.origin}/users/42`);
+  });
+
   it('records the previous path as ux.route.from', () => {
     history.pushState({}, '', '/step-1');
     history.pushState({}, '', '/step-2'); // ends /step-1

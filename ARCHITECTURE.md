@@ -71,10 +71,10 @@ Trace (session)
 │
 ├── Span: navigation → /checkout          ← root span per route
 │   ├── Span: click "Add to cart"
-│   ├── Span: POST /api/cart              ← correlated with backend via traceparent
+│   ├── Span: POST  (url.full /api/cart)  ← correlated with backend via traceparent
 │   │     └── Event: response.error (429)
 │   ├── Span: click "Retry"
-│   └── Span: POST /api/cart (success)
+│   └── Span: POST  (url.full /api/cart, success)
 │
 └── Span: navigation → /order-confirm
     └── Span: page.load
@@ -96,7 +96,7 @@ live under the `ux.*` namespace.
 
 ```json
 {
-  "name": "navigation /cart → /checkout",
+  "name": "navigation",
   "attributes": {
     "ux.route.from": "/cart",
     "ux.route.to": "/checkout",
@@ -114,7 +114,7 @@ live under the `ux.*` namespace.
 
 ```json
 {
-  "name": "click button[Place Order]",
+  "name": "click button",
   "attributes": {
     "ux.interaction.type": "click",
     "ux.element.tag": "button",
@@ -131,13 +131,13 @@ live under the `ux.*` namespace.
 
 ```json
 {
-  "name": "POST /api/orders",
+  "name": "POST",
   "attributes": {
     "http.method": "POST",
     "http.url": "/api/orders",
     "http.status_code": 422,
     "ux.api.user_wait_ms": 1840,
-    "ux.api.triggered_by": "click button[Place Order]"
+    "ux.api.triggered_by": "Place Order"
   },
   "events": [
     { "name": "request.sent" },
@@ -205,3 +205,4 @@ within minutes of installing the SDK. Demo-ability drives adoption.
 | OTLP/HTTP JSON transport | Most browser-compatible; works with any collector |
 | Session = Trace, Route = root Span | Makes data natively queryable without custom tooling |
 | W3C `traceparent` propagation | Frontend-to-backend trace stitching, zero backend changes needed |
+| Low-cardinality span names (`navigation`, `click <tag>`, `{method}`); paths, labels and URLs only in attributes | `piiPatterns` redacts attribute values, never names, so any user text in a name would bypass it. Also OTel naming guidance: names group operations, attributes carry specifics |

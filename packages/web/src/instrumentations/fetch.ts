@@ -3,14 +3,6 @@ import { propagation, context, trace, SpanStatusCode } from '@opentelemetry/api'
 import type { ResolvedConfig } from '@tindalabs/blindspot-core';
 import { getRouteContext, getLastInteractionLabel } from '../context.js';
 
-function getPathname(url: string): string {
-  try {
-    return new URL(url, location.origin).pathname;
-  } catch {
-    return url;
-  }
-}
-
 function mergeHeaders(
   existing: HeadersInit | undefined,
   injected: Record<string, string>,
@@ -52,8 +44,11 @@ export function initFetch(config: ResolvedConfig): void {
 
     const t0 = Date.now();
 
+    // Semconv names HTTP client spans "{method}" when no url.template is known.
+    // The raw path is high-cardinality and may carry identifiers; it stays in
+    // url.full, where piiPatterns redaction applies.
     const span = getTracer().startSpan(
-      `${method} ${getPathname(url)}`,
+      method,
       {
         attributes: {
           'http.request.method': method,

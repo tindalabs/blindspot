@@ -1,5 +1,6 @@
 export { init } from './init.js';
 export {
+  beginRouteSpan,
   setRouteSpan,
   clearRouteSpan,
   getRouteSpan,
@@ -16,6 +17,7 @@ export {
   getElementLabel,
   ConsentGate,
 } from '@tindalabs/blindspot-core';
+export type { RouteChange, RouteTrigger } from './context.js';
 export type {
   BlindspotConfig,
   ResolvedConfig,

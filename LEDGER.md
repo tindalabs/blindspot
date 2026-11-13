@@ -90,3 +90,20 @@ OTel tooling that understands `session.id` cannot group Blindspot sessions.
 **Closed when:** a decision is recorded in ARCHITECTURE.md: emit `session.id` (possibly
 alongside `ux.session.id` for one deprecation cycle), or keep `ux.session.id` with the
 stated reason. Check the convention's current stability level before deciding.
+
+## L7: Route templates for navigation and fetch spans (low)
+
+**Where:** the adapters in `packages/{react,vue,svelte,next}/src/`, and
+[`packages/web/src/context.ts`](packages/web/src/context.ts) (`beginRouteSpan`)
+
+Route spans are named `navigation` and fetch spans just `{method}`, because raw paths
+are high-cardinality and can carry PII. Several routers know the route *template*
+(Vue `to.matched`, SvelteKit `route.id`, React Router matches), which is
+low-cardinality and free of user data. Semconv allows `{method} {url.template}` for
+HTTP client spans, and a `ux.route.template` attribute would let dashboards group
+routes without regexes over paths.
+
+**Closed when:** a decision is recorded on whether to add an optional `template` to
+`RouteChange` (attribute only, or also in the name), and the adapters that can supply
+one do, with tests. Vanilla routing and Next App Router have no template, so they keep
+the plain name.

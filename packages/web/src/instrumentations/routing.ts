@@ -1,7 +1,5 @@
-import { getTracer } from '@tindalabs/blindspot-core';
 import type { ResolvedConfig } from '@tindalabs/blindspot-core';
-import type { Context } from '@opentelemetry/api';
-import { setRouteSpan, clearRouteSpan } from '../context.js';
+import { beginRouteSpan, type RouteTrigger } from '../context.js';
 
 let _currentPath = '';
 
@@ -9,19 +7,9 @@ export function _resetRoutingForTesting(): void {
   _currentPath = '';
 }
 
-function navigate(to: string, from: string, trigger: 'user' | 'initial' | 'back-forward', parentContext?: Context): void {
-  clearRouteSpan();
-
-  const span = getTracer().startSpan(`navigation ${from || '(none)'} → ${to}`, {
-    attributes: {
-      'ux.route.from': from,
-      'ux.route.to': to,
-      'ux.route.trigger': trigger,
-      'url.full': location.href,
-    },
-  }, parentContext);
-
-  setRouteSpan(span);
+function navigate(to: string, from: string, trigger: RouteTrigger): void {
+  const span = beginRouteSpan({ from, to, trigger });
+  span.setAttribute('url.full', location.href);
   _currentPath = to;
 }
 

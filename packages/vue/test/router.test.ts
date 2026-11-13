@@ -1,19 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const mockSetRouteSpan = vi.hoisted(() => vi.fn());
-const mockClearRouteSpan = vi.hoisted(() => vi.fn());
+const mockBeginRouteSpan = vi.hoisted(() => vi.fn().mockReturnValue({ end: vi.fn(), setAttribute: vi.fn(), addEvent: vi.fn() }));
 const mockLoadRouteContextAfterReload = vi.hoisted(() => vi.fn());
-const mockStartSpan = vi.hoisted(() =>
-  vi.fn().mockReturnValue({ end: vi.fn(), setAttribute: vi.fn(), addEvent: vi.fn() }),
-);
 
 vi.mock('@tindalabs/blindspot', () => ({
   init: vi.fn(),
-  setRouteSpan: mockSetRouteSpan,
-  clearRouteSpan: mockClearRouteSpan,
+  beginRouteSpan: mockBeginRouteSpan,
   getRouteSpan: vi.fn(),
   getRouteContext: vi.fn(),
-  getTracer: vi.fn().mockReturnValue({ startSpan: mockStartSpan }),
   loadRouteContextAfterReload: mockLoadRouteContextAfterReload,
 }));
 
@@ -45,18 +39,11 @@ describe('installBlindspotRouter', () => {
     installBlindspotRouter(router as never);
     router.navigate('/home');
 
-    expect(mockStartSpan).toHaveBeenCalledWith(
-      'navigation (none) → /home',
-      expect.objectContaining({
-        attributes: expect.objectContaining({
-          'ux.route.trigger': 'initial',
-          'ux.route.to': '/home',
-          'ux.route.from': '',
-        }),
-      }),
+    expect(mockBeginRouteSpan).toHaveBeenCalledWith(
+      { from: '', to: '/home', trigger: 'initial' },
       undefined,
     );
-    expect(mockSetRouteSpan).toHaveBeenCalledTimes(1);
+    expect(mockBeginRouteSpan).toHaveBeenCalledTimes(1);
   });
 
   it('does not register a beforeEach guard (avoids the root-context gap)', () => {
@@ -68,22 +55,17 @@ describe('installBlindspotRouter', () => {
     expect(router.beforeRegistered).toBe(false);
   });
 
-  it('clears then re-sets the route span atomically within afterEach', () => {
+  it('opens a route span on each navigation within afterEach', () => {
     const router = makeRouter();
     installBlindspotRouter(router as never);
     router.navigate('/home');
 
     // Both happen in the single afterEach callback, clear before set, so a route
     // span is active at all times and in-route activity nests under it.
-    expect(mockClearRouteSpan).toHaveBeenCalledTimes(1);
-    expect(mockSetRouteSpan).toHaveBeenCalledTimes(1);
-    expect(mockClearRouteSpan.mock.invocationCallOrder[0]!).toBeLessThan(
-      mockSetRouteSpan.mock.invocationCallOrder[0]!,
-    );
+    expect(mockBeginRouteSpan).toHaveBeenCalledTimes(1);
 
     router.navigate('/about');
-    expect(mockClearRouteSpan).toHaveBeenCalledTimes(2);
-    expect(mockSetRouteSpan).toHaveBeenCalledTimes(2);
+    expect(mockBeginRouteSpan).toHaveBeenCalledTimes(2);
   });
 
   it('records the from/to path on subsequent navigation', () => {
@@ -94,15 +76,8 @@ describe('installBlindspotRouter', () => {
     mockLoadRouteContextAfterReload.mockReturnValue(undefined);
     router.navigate('/about');
 
-    expect(mockStartSpan).toHaveBeenCalledWith(
-      'navigation /home → /about',
-      expect.objectContaining({
-        attributes: expect.objectContaining({
-          'ux.route.trigger': 'user',
-          'ux.route.from': '/home',
-          'ux.route.to': '/about',
-        }),
-      }),
+    expect(mockBeginRouteSpan).toHaveBeenCalledWith(
+      { from: '/home', to: '/about', trigger: 'user' },
       undefined,
     );
   });
@@ -114,11 +89,7 @@ describe('installBlindspotRouter', () => {
     installBlindspotRouter(router as never);
     router.navigate('/home');
 
-    expect(mockStartSpan).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.any(Object),
-      fakeCtx,
-    );
+    expect(mockBeginRouteSpan).toHaveBeenCalledWith(expect.any(Object), fakeCtx);
   });
 
   it('does not pass reload context on subsequent navigations', () => {
@@ -129,10 +100,6 @@ describe('installBlindspotRouter', () => {
     router.navigate('/about');
 
     expect(mockLoadRouteContextAfterReload).not.toHaveBeenCalled();
-    expect(mockStartSpan).toHaveBeenLastCalledWith(
-      expect.any(String),
-      expect.any(Object),
-      undefined,
-    );
+    expect(mockBeginRouteSpan).toHaveBeenLastCalledWith(expect.any(Object), undefined);
   });
 });

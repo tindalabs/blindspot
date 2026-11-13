@@ -121,10 +121,10 @@ Spans emitted automatically when their instrumentation is enabled.
 
 | Instrumentation | Span name pattern | Key attributes |
 |---|---|---|
-| `routing` | `navigation {from} → {to}` | `ux.route.from`, `ux.route.to`, `ux.route.trigger` |
-| `clicks` | `click {tag}[{label}]` | `ux.interaction.type`, `ux.element.label`, `ux.element.tag`, `ux.element.role`, `ux.rage_click`, `ux.dead_click` |
+| `routing` | `navigation` | `ux.route.from`, `ux.route.to`, `ux.route.trigger` |
+| `clicks` | `click {tag}` | `ux.interaction.type`, `ux.element.label`, `ux.element.tag`, `ux.element.role`, `ux.rage_click`, `ux.dead_click` |
 | `forms` | `form.submit {name}` | `ux.form.name`, `ux.form.valid`, `ux.form.attempts` |
-| `fetch` | `{METHOD} {path}` | `http.request.method`, `url.full`, `http.response.status_code`, `ux.api.user_wait_ms`, `ux.api.triggered_by` |
+| `fetch` | `{METHOD}` | `http.request.method`, `url.full`, `http.response.status_code`, `ux.api.user_wait_ms`, `ux.api.triggered_by` |
 | `vitals` | Events on route span | `lcp`, `cls`, `inp` (as span events with `web_vital.value`) |
 | `errors` | `error.unhandled` | `exception` event → `exception.type`, `exception.message` (sanitized) |
 
