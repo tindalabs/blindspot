@@ -4,6 +4,7 @@
   "scripts": {
     "build": "turbo build",
     "test": "turbo test",
+    "test:coverage": "turbo test -- --coverage",
     "type-check": "turbo type-check",
     "lint": "turbo lint",
     "docs:dev": "pnpm --filter @tindalabs/blindspot-docs dev",

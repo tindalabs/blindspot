@@ -25,6 +25,7 @@ pnpm build
 ```bash
 pnpm build         # build all packages
 pnpm test          # run test suites
+pnpm test:coverage # run test suites with coverage, as CI does
 pnpm type-check    # TypeScript check
 pnpm lint          # ESLint across all packages
 pnpm e2e           # Playwright end-to-end tests

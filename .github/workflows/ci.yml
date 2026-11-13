@@ -38,8 +38,11 @@ jobs:
       - name: Check package exports
         run: pnpm lint:package
 
+      # Coverage is not gated by a threshold; running it is what matters. The
+      # coverage provider must match the vitest version exactly, and a mismatch
+      # only fails a coverage run (Dependabot PR #50 passed plain tests).
       - name: Test
-        run: pnpm test
+        run: pnpm test:coverage
 
       - name: Audit
         run: pnpm audit --audit-level=high
