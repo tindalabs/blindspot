@@ -137,3 +137,24 @@ every consumer, so it needs a changeset that says so.
 line together, imports use `@opentelemetry/sdk-trace` instead of `sdk-trace-base`, the
 consumer-facing api peer change is in a changeset, and all the OTel Dependabot holds are
 removed in the same PR.
+
+## L13: CLS and INP are page-level values reported on one route span (medium, needs a decision)
+
+**Where:** [`packages/web/src/instrumentations/vitals.ts`](packages/web/src/instrumentations/vitals.ts),
+`web-vitals` in [`packages/web/package.json`](packages/web/package.json)
+
+web-vitals 5 measures CLS and INP over the whole page lifetime and reports them when the
+page is hidden. `vitals.ts` attaches them to whichever route span is open at that moment,
+so in a single-page app the last route visited carries the CLS and INP of every route
+before it, and the earlier routes carry none. Dashboards that group vitals by route
+blame the wrong page.
+
+web-vitals 6 can report per soft navigation (`reportSoftNavs: true`), which matches the
+one-trace-per-route model, but only Chromium 151+ supports it and it costs +893 B
+gzipped for `onLCP`/`onCLS`/`onINP` (2204 B on 5.3.0, 3097 B on 6.x, measured by
+bundling only those three). Dependabot PR #62 (web-vitals 6) is held on this decision.
+
+**Closed when:** a decision is recorded in ARCHITECTURE.md (adopt soft-navigation
+reporting on web-vitals 6, or keep page-level values and label them as such, for example
+with an attribute), it is implemented with an e2e test that navigates between routes,
+and #62 is merged or closed to match.
