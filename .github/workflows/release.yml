@@ -31,11 +31,13 @@ jobs:
           # set NODE_AUTH_TOKEN — npm uses the GitHub OIDC token instead.
           registry-url: https://registry.npmjs.org
 
-      # Trusted Publishing (OIDC, no NPM_TOKEN) requires npm >= 11.5.1.
-      # Node 20 ships npm 10.x, so upgrade the npm that `changeset publish`
-      # shells out to.
+      # Trusted Publishing (OIDC, no NPM_TOKEN) requires npm >= 11.5.1, newer
+      # than the npm bundled with Node 22, so upgrade the npm that
+      # `changeset publish` shells out to. Pinned to major 11: npm 12 rejects the
+      # --no-git-checks flag that pnpm 9 passes through, which failed the 0.2.0
+      # publish (see LEDGER.md).
       - name: Upgrade npm for Trusted Publishing
-        run: npm install -g npm@latest
+        run: npm install -g npm@11
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile

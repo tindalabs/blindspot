@@ -195,3 +195,19 @@ while the peer range still claims it.
 with a changeset, or cap the range at 18 until tested), the adapter tests and e2e run
 against every major the peer range allows, and the grouped Dependabot PR is merged or
 closed to match.
+
+## L16: The release workflow is pinned to npm 11 (medium)
+
+**Where:** the "Upgrade npm for Trusted Publishing" step in
+[`release.yml`](.github/workflows/release.yml)
+
+`changeset publish` runs `pnpm publish --no-git-checks`, and pnpm 9 passes the flag on to
+npm. npm 11 warns that it is unknown; npm 12 rejects it with `EUNKNOWNCONFIG`, which is
+how the 0.2.0 release failed when the step installed `npm@latest` and got 12.2.2. The pin
+keeps releases working, but npm 11 will eventually stop receiving fixes, and Trusted
+Publishing depends on the npm version.
+
+**Closed when:** the publish path no longer hands npm a flag it rejects (likely a pnpm
+upgrade, which **verify** rather than assume), a dry run with the new npm major passes
+(`npm publish --dry-run` with the flags changesets uses), and the pin moves to that
+major.
