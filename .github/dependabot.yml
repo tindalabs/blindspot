@@ -24,6 +24,14 @@ updates:
       # would type-check APIs our runtime lacks. Bump it with .nvmrc.
       - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
+      # The OTLP exporter 0.300+ is built on OTel JS SDK 3 and needs api 1.10+,
+      # while sdk-trace-web is still on SDK 2 (which needs api < 1.10). Mixing
+      # the lines breaks peers and bundles two SDKs. Lift these with the SDK 3
+      # migration (see LEDGER.md).
+      - dependency-name: "@opentelemetry/exporter-trace-otlp-http"
+        versions: [">=0.300.0"]
+      - dependency-name: "@opentelemetry/api"
+        versions: [">=1.10.0"]
     commit-message:
       prefix: "chore(deps)"
       include: "scope"
