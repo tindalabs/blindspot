@@ -33,6 +33,11 @@ jobs:
       - name: Build
         run: pnpm build
 
+      # Lints what npm will actually publish: export conditions and the types
+      # each module resolution mode sees. Types misresolve silently in consumers.
+      - name: Check package exports
+        run: pnpm lint:package
+
       - name: Test
         run: pnpm test
 
