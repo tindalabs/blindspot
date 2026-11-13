@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeAll, afterEach } from 'vitest';
-import { ROOT_CONTEXT, trace } from '@opentelemetry/api';
 import { type InMemorySpanExporter } from '@opentelemetry/sdk-trace-base';
 import { setupOTel } from './helpers.js';
 import { beginRouteSpan, getRouteSpan, _resetContextForTesting } from '../src/context.js';
@@ -37,16 +36,12 @@ describe('beginRouteSpan', () => {
     expect(ended[0].spanContext().spanId).toBe(first.spanContext().spanId);
   });
 
-  it('parents the span on the given context, continuing that trace', () => {
-    const parent = trace.getTracer('test').startSpan('previous-page');
-    const parentContext = trace.setSpan(ROOT_CONTEXT, parent);
-    const span = beginRouteSpan({ from: '', to: '/', trigger: 'initial' }, parentContext);
-    expect(span.spanContext().traceId).toBe(parent.spanContext().traceId);
-  });
-
-  it('starts a new root trace when no parent context is given', () => {
+  it('starts every route span as the root of a new trace', () => {
     const first = beginRouteSpan({ from: '', to: '/a', trigger: 'initial' });
     const second = beginRouteSpan({ from: '/a', to: '/b', trigger: 'user' });
     expect(second.spanContext().traceId).not.toBe(first.spanContext().traceId);
+    second.end();
+    const exported = exporter.getFinishedSpans();
+    expect(exported.every((span) => span.parentSpanContext === undefined)).toBe(true);
   });
 });

@@ -9,7 +9,6 @@ vi.mock('@tindalabs/blindspot', () => ({
   clearRouteSpan: vi.fn(),
   getRouteSpan: vi.fn(),
   getRouteContext: vi.fn(),
-  loadRouteContextAfterReload: vi.fn().mockReturnValue(undefined),
 }));
 
 vi.mock('next/navigation', () => ({

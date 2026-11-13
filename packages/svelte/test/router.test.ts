@@ -1,14 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockBeginRouteSpan = vi.hoisted(() => vi.fn().mockReturnValue({ end: vi.fn(), setAttribute: vi.fn(), addEvent: vi.fn() }));
-const mockLoadRouteContextAfterReload = vi.hoisted(() => vi.fn());
 
 vi.mock('@tindalabs/blindspot', () => ({
   init: vi.fn(),
   beginRouteSpan: mockBeginRouteSpan,
   getRouteSpan: vi.fn(),
   getRouteContext: vi.fn(),
-  loadRouteContextAfterReload: mockLoadRouteContextAfterReload,
 }));
 
 import { installBlindspotRouter } from '../src/router.js';
@@ -50,7 +48,6 @@ function makeHooks() {
 describe('installBlindspotRouter', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockLoadRouteContextAfterReload.mockReturnValue(undefined);
   });
 
   it('creates an initial span on first navigation', () => {
@@ -60,7 +57,6 @@ describe('installBlindspotRouter', () => {
 
     expect(mockBeginRouteSpan).toHaveBeenCalledWith(
       { from: '', to: '/home', trigger: 'initial' },
-      undefined,
     );
     expect(mockBeginRouteSpan).toHaveBeenCalledTimes(1);
   });
@@ -89,12 +85,10 @@ describe('installBlindspotRouter', () => {
     installBlindspotRouter(hooks);
     hooks.navigate(null, '/home');
     vi.clearAllMocks();
-    mockLoadRouteContextAfterReload.mockReturnValue(undefined);
     hooks.navigate('/home', '/about');
 
     expect(mockBeginRouteSpan).toHaveBeenCalledWith(
       { from: '/home', to: '/about', trigger: 'user' },
-      undefined,
     );
   });
 
@@ -105,30 +99,7 @@ describe('installBlindspotRouter', () => {
 
     expect(mockBeginRouteSpan).toHaveBeenCalledWith(
       expect.objectContaining({ from: '', to: '/search?q=hello' }),
-      undefined,
     );
-  });
-
-  it('loads reload context for the initial navigation', () => {
-    const fakeContext = { spanId: 'abc' };
-    mockLoadRouteContextAfterReload.mockReturnValue(fakeContext);
-
-    const hooks = makeHooks();
-    installBlindspotRouter(hooks);
-    hooks.navigate(null, '/home');
-
-    expect(mockBeginRouteSpan).toHaveBeenCalledWith(expect.any(Object), fakeContext);
-  });
-
-  it('does not pass reload context for subsequent navigations', () => {
-    const hooks = makeHooks();
-    installBlindspotRouter(hooks);
-    hooks.navigate(null, '/home');
-    vi.clearAllMocks();
-    mockLoadRouteContextAfterReload.mockReturnValue({ spanId: 'should-not-be-used' });
-    hooks.navigate('/home', '/about');
-
-    expect(mockBeginRouteSpan).toHaveBeenCalledWith(expect.any(Object), undefined);
   });
 
   it('is a no-op in SSR (window undefined)', () => {

@@ -1,14 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockBeginRouteSpan = vi.hoisted(() => vi.fn().mockReturnValue({ end: vi.fn(), setAttribute: vi.fn(), addEvent: vi.fn() }));
-const mockLoadRouteContextAfterReload = vi.hoisted(() => vi.fn());
 
 vi.mock('@tindalabs/blindspot', () => ({
   init: vi.fn(),
   beginRouteSpan: mockBeginRouteSpan,
   getRouteSpan: vi.fn(),
   getRouteContext: vi.fn(),
-  loadRouteContextAfterReload: mockLoadRouteContextAfterReload,
 }));
 
 import { installBlindspotRouter } from '../src/router.js';
@@ -31,7 +29,6 @@ function makeRouter() {
 describe('installBlindspotRouter', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockLoadRouteContextAfterReload.mockReturnValue(undefined);
   });
 
   it('creates an initial span on first navigation', () => {
@@ -41,7 +38,6 @@ describe('installBlindspotRouter', () => {
 
     expect(mockBeginRouteSpan).toHaveBeenCalledWith(
       { from: '', to: '/home', trigger: 'initial' },
-      undefined,
     );
     expect(mockBeginRouteSpan).toHaveBeenCalledTimes(1);
   });
@@ -73,33 +69,11 @@ describe('installBlindspotRouter', () => {
     installBlindspotRouter(router as never);
     router.navigate('/home');
     vi.clearAllMocks();
-    mockLoadRouteContextAfterReload.mockReturnValue(undefined);
     router.navigate('/about');
 
     expect(mockBeginRouteSpan).toHaveBeenCalledWith(
       { from: '/home', to: '/about', trigger: 'user' },
-      undefined,
     );
   });
 
-  it('passes reload context on initial navigation', () => {
-    const fakeCtx = {};
-    mockLoadRouteContextAfterReload.mockReturnValue(fakeCtx);
-    const router = makeRouter();
-    installBlindspotRouter(router as never);
-    router.navigate('/home');
-
-    expect(mockBeginRouteSpan).toHaveBeenCalledWith(expect.any(Object), fakeCtx);
-  });
-
-  it('does not pass reload context on subsequent navigations', () => {
-    const router = makeRouter();
-    installBlindspotRouter(router as never);
-    router.navigate('/home');
-    mockLoadRouteContextAfterReload.mockClear();
-    router.navigate('/about');
-
-    expect(mockLoadRouteContextAfterReload).not.toHaveBeenCalled();
-    expect(mockBeginRouteSpan).toHaveBeenLastCalledWith(expect.any(Object), undefined);
-  });
 });

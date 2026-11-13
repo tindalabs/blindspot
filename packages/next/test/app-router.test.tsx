@@ -4,7 +4,6 @@ import { cleanup, render } from '@testing-library/react';
 const mockBeginRouteSpan = vi.hoisted(() =>
   vi.fn().mockReturnValue({ end: vi.fn(), setAttribute: vi.fn(), addEvent: vi.fn() }),
 );
-const mockLoadRouteContextAfterReload = vi.hoisted(() => vi.fn());
 const mockUsePathname = vi.hoisted(() => vi.fn(() => '/'));
 const mockUseSearchParams = vi.hoisted(() => vi.fn(() => null));
 
@@ -13,7 +12,6 @@ vi.mock('@tindalabs/blindspot', () => ({
   beginRouteSpan: mockBeginRouteSpan,
   getRouteSpan: vi.fn(),
   getRouteContext: vi.fn(),
-  loadRouteContextAfterReload: mockLoadRouteContextAfterReload,
 }));
 
 vi.mock('next/navigation', () => ({
@@ -26,7 +24,6 @@ import { BlindspotAppRouter } from '../src/app-router.js';
 describe('BlindspotAppRouter', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockLoadRouteContextAfterReload.mockReturnValue(undefined);
     mockBeginRouteSpan.mockReturnValue({ end: vi.fn(), setAttribute: vi.fn(), addEvent: vi.fn() });
   });
   afterEach(() => cleanup());
@@ -39,20 +36,8 @@ describe('BlindspotAppRouter', () => {
 
     expect(mockBeginRouteSpan).toHaveBeenCalledWith(
       { from: '', to: '/home', trigger: 'initial' },
-      undefined,
     );
     expect(mockBeginRouteSpan).toHaveBeenCalledTimes(1);
-  });
-
-  it('uses reload context on initial navigation', () => {
-    const fakeCtx = {};
-    mockLoadRouteContextAfterReload.mockReturnValue(fakeCtx);
-    mockUsePathname.mockReturnValue('/home');
-    mockUseSearchParams.mockReturnValue(null);
-
-    render(<BlindspotAppRouter />);
-
-    expect(mockBeginRouteSpan).toHaveBeenCalledWith(expect.any(Object), fakeCtx);
   });
 
   it('creates a new span on pathname change', () => {
@@ -61,7 +46,6 @@ describe('BlindspotAppRouter', () => {
 
     const { rerender } = render(<BlindspotAppRouter />);
     vi.clearAllMocks();
-    mockLoadRouteContextAfterReload.mockReturnValue(undefined);
     mockBeginRouteSpan.mockReturnValue({ end: vi.fn(), setAttribute: vi.fn(), addEvent: vi.fn() });
 
     mockUsePathname.mockReturnValue('/about');
@@ -69,7 +53,6 @@ describe('BlindspotAppRouter', () => {
 
     expect(mockBeginRouteSpan).toHaveBeenCalledWith(
       { from: '/home', to: '/about', trigger: 'user' },
-      undefined,
     );
   });
 
@@ -82,7 +65,6 @@ describe('BlindspotAppRouter', () => {
 
     expect(mockBeginRouteSpan).toHaveBeenCalledWith(
       expect.objectContaining({ from: '', to: '/search?q=hello' }),
-      undefined,
     );
   });
 });

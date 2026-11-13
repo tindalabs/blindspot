@@ -11,7 +11,6 @@ vi.mock('@tindalabs/blindspot', () => ({
   getRouteSpan: vi.fn(),
   getRouteContext: vi.fn(),
   getTracer: vi.fn(),
-  loadRouteContextAfterReload: vi.fn(),
 }));
 
 vi.mock('../src/router.js', () => ({

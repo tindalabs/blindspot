@@ -1,11 +1,7 @@
 'use client';
 import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
-import {
-  beginRouteSpan,
-  clearRouteSpan,
-  loadRouteContextAfterReload,
-} from '@tindalabs/blindspot';
+import { beginRouteSpan, clearRouteSpan } from '@tindalabs/blindspot';
 
 export function BlindspotPagesRouter() {
   const router = useRouter();
@@ -13,10 +9,7 @@ export function BlindspotPagesRouter() {
 
   useEffect(() => {
     const initialPath = router.asPath;
-    beginRouteSpan(
-      { from: '', to: initialPath, trigger: 'initial' },
-      loadRouteContextAfterReload(),
-    );
+    beginRouteSpan({ from: '', to: initialPath, trigger: 'initial' });
     prevPath.current = initialPath;
 
     function onRouteChangeComplete(url: string) {

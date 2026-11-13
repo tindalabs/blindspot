@@ -6,7 +6,6 @@ export {
   getRouteSpan,
   getRouteContext,
   getSessionTraceparent,
-  loadRouteContextAfterReload,
 } from './context.js';
 export {
   grantConsent,

@@ -44,8 +44,9 @@ The main user-facing package. Builds on core.
 - [x] Detect popstate (back/forward)
 - [x] Create root span per route, end on next navigation
 - [x] Attach `ux.route.*` attributes
-- [x] Session continuity on hard refresh — serialize active trace context to `sessionStorage`
-      and rehydrate on `init()` so a page reload stays in the same trace
+- [x] ~~Session continuity on hard refresh~~ (reverted): each page load starts a new trace.
+      The previous page's route span is sent by a `pagehide` beacon that may never arrive,
+      so a reloaded page parented on it showed as an orphan in Tempo.
 
 ### Click instrumentation
 - [x] Wrap click capture with semantic enrichment (own implementation, not OTel contrib)

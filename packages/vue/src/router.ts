@@ -1,5 +1,5 @@
 import type { Router } from 'vue-router';
-import { beginRouteSpan, loadRouteContextAfterReload } from '@tindalabs/blindspot';
+import { beginRouteSpan } from '@tindalabs/blindspot';
 
 export function installBlindspotRouter(router: Router): void {
   let isFirst = true;
@@ -15,9 +15,7 @@ export function installBlindspotRouter(router: Router): void {
     // a window where getRouteContext() was root — any click/fetch/error fired in
     // that gap orphaned into its own root trace instead of nesting under the
     // route. Mirrors the React adapter's single-effect clear → create → set.
-    const parentContext =
-      trigger === 'initial' ? loadRouteContextAfterReload() : undefined;
-    beginRouteSpan({ from: prevPath, to: toPath, trigger }, parentContext);
+    beginRouteSpan({ from: prevPath, to: toPath, trigger });
     prevPath = toPath;
   });
 }

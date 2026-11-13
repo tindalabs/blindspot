@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { beginRouteSpan, loadRouteContextAfterReload } from '@tindalabs/blindspot';
+import { beginRouteSpan } from '@tindalabs/blindspot';
 
 export function BlindspotAppRouter() {
   const pathname = usePathname();
@@ -22,8 +22,7 @@ export function BlindspotAppRouter() {
     prevPath.current = to;
 
     const trigger = isFirst ? 'initial' : 'user';
-    const parentContext = isFirst ? loadRouteContextAfterReload() : undefined;
-    beginRouteSpan({ from, to, trigger }, parentContext);
+    beginRouteSpan({ from, to, trigger });
   }, [pathname, search]);
 
   return null;

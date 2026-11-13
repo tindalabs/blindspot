@@ -1,8 +1,6 @@
-import type { Context, Span, SpanContext } from '@opentelemetry/api';
+import type { Context, Span } from '@opentelemetry/api';
 import { context, trace } from '@opentelemetry/api';
 import { getTracer } from '@tindalabs/blindspot-core';
-
-const RELOAD_CTX_KEY = 'blindspot.reload_ctx';
 
 let _routeSpan: Span | undefined;
 let _routeContext: Context = context.active();
@@ -28,10 +26,11 @@ const NAVIGATION_SPAN_NAME = 'navigation';
 
 /**
  * End the current route span and start the next one as the new route span.
- * Without a parentContext the route opens a new trace, which is the normal case:
- * one trace per route.
+ * Every route span is a new root: one trace per route. Each page load starts
+ * fresh rather than continuing the previous page's trace, because that parent was
+ * sent by a pagehide beacon that may never arrive, leaving the child orphaned.
  */
-export function beginRouteSpan(route: RouteChange, parentContext?: Context): Span {
+export function beginRouteSpan(route: RouteChange): Span {
   clearRouteSpan();
   const span = getTracer().startSpan(
     NAVIGATION_SPAN_NAME,
@@ -42,7 +41,6 @@ export function beginRouteSpan(route: RouteChange, parentContext?: Context): Spa
         'ux.route.trigger': route.trigger,
       },
     },
-    parentContext,
   );
   setRouteSpan(span);
   return span;
@@ -79,37 +77,6 @@ export function getSessionTraceparent(): string | null {
   if (sc.traceId.length !== 32 || sc.spanId.length !== 16) return null;
   const flags = (sc.traceFlags & 0xff).toString(16).padStart(2, '0');
   return `00-${sc.traceId}-${sc.spanId}-${flags}`;
-}
-
-export function saveRouteContextForReload(): void {
-  if (!_routeSpan) return;
-  const sc = _routeSpan.spanContext();
-  if (sc.traceId.length !== 32 || sc.spanId.length !== 16) return;
-  try {
-    const flags = (sc.traceFlags & 0xff).toString(16).padStart(2, '0');
-    sessionStorage.setItem(RELOAD_CTX_KEY, `00-${sc.traceId}-${sc.spanId}-${flags}`);
-  } catch { /* sessionStorage unavailable */ }
-}
-
-export function loadRouteContextAfterReload(): Context | undefined {
-  try {
-    const raw = sessionStorage.getItem(RELOAD_CTX_KEY);
-    sessionStorage.removeItem(RELOAD_CTX_KEY);
-    if (!raw) return undefined;
-    const parts = raw.split('-');
-    if (parts.length !== 4 || parts[0] !== '00') return undefined;
-    const [, traceId, spanId, flags] = parts;
-    if (traceId.length !== 32 || spanId.length !== 16) return undefined;
-    const spanContext: SpanContext = {
-      traceId,
-      spanId,
-      traceFlags: parseInt(flags, 16),
-      isRemote: true,
-    };
-    return trace.setSpanContext(context.active(), spanContext);
-  } catch {
-    return undefined;
-  }
 }
 
 export function _resetContextForTesting(): void {

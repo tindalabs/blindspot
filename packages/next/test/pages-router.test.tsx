@@ -2,7 +2,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, render } from '@testing-library/react';
 
 const mockClearRouteSpan = vi.hoisted(() => vi.fn());
-const mockLoadRouteContextAfterReload = vi.hoisted(() => vi.fn());
 const mockBeginRouteSpan = vi.hoisted(() =>
   vi.fn().mockReturnValue({ end: vi.fn(), setAttribute: vi.fn(), addEvent: vi.fn() }),
 );
@@ -18,7 +17,6 @@ vi.mock('@tindalabs/blindspot', () => ({
   clearRouteSpan: mockClearRouteSpan,
   getRouteSpan: vi.fn(),
   getRouteContext: vi.fn(),
-  loadRouteContextAfterReload: mockLoadRouteContextAfterReload,
 }));
 
 vi.mock('next/router', () => ({
@@ -35,7 +33,6 @@ function getEventHandler(event: string) {
 describe('BlindspotPagesRouter', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockLoadRouteContextAfterReload.mockReturnValue(undefined);
     mockUseRouter.mockReturnValue({ asPath: '/home', events: mockRouterEvents });
   });
   afterEach(() => cleanup());
@@ -45,18 +42,8 @@ describe('BlindspotPagesRouter', () => {
 
     expect(mockBeginRouteSpan).toHaveBeenCalledWith(
       { from: '', to: '/home', trigger: 'initial' },
-      undefined,
     );
     expect(mockBeginRouteSpan).toHaveBeenCalledTimes(1);
-  });
-
-  it('uses reload context on initial navigation', () => {
-    const fakeCtx = {};
-    mockLoadRouteContextAfterReload.mockReturnValue(fakeCtx);
-
-    render(<BlindspotPagesRouter />);
-
-    expect(mockBeginRouteSpan).toHaveBeenCalledWith(expect.any(Object), fakeCtx);
   });
 
   it('registers only a routeChangeComplete handler (no separate routeChangeStart clear)', () => {

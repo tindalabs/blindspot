@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeAll, beforeEach, afterEach } from 'vitest';
-import { trace } from '@opentelemetry/api';
 import { type InMemorySpanExporter } from '@opentelemetry/sdk-trace-base';
 import { setupOTel, makeConfig } from './helpers.js';
 import { initRouting, _resetRoutingForTesting } from '../src/instrumentations/routing.js';
@@ -7,8 +6,6 @@ import {
   _resetContextForTesting,
   getRouteSpan,
   getSessionTraceparent,
-  saveRouteContextForReload,
-  loadRouteContextAfterReload,
 } from '../src/context.js';
 
 let exporter: InMemorySpanExporter;
@@ -25,63 +22,6 @@ afterEach(() => {
   exporter.reset();
   _resetContextForTesting();
   _resetRoutingForTesting();
-});
-
-describe('reload trace continuity', () => {
-  beforeEach(() => {
-    _resetContextForTesting();
-    _resetRoutingForTesting();
-  });
-
-  afterEach(() => {
-    try { sessionStorage.removeItem('blindspot.reload_ctx'); } catch { /* ignore */ }
-  });
-
-  it('saveRouteContextForReload does nothing when no route span is active', () => {
-    saveRouteContextForReload();
-    expect(sessionStorage.getItem('blindspot.reload_ctx')).toBeNull();
-  });
-
-  it('saveRouteContextForReload writes a valid traceparent to sessionStorage', () => {
-    history.pushState({}, '', '/pre-reload');
-    saveRouteContextForReload();
-    expect(sessionStorage.getItem('blindspot.reload_ctx')).toMatch(
-      /^00-[0-9a-f]{32}-[0-9a-f]{16}-0[01]$/,
-    );
-  });
-
-  it('loadRouteContextAfterReload returns undefined when nothing is stored', () => {
-    expect(loadRouteContextAfterReload()).toBeUndefined();
-  });
-
-  it('loadRouteContextAfterReload restores span context and clears the key', () => {
-    const traceId = 'a0'.repeat(16);
-    const spanId = 'b0'.repeat(8);
-    sessionStorage.setItem('blindspot.reload_ctx', `00-${traceId}-${spanId}-01`);
-
-    const ctx = loadRouteContextAfterReload();
-    expect(ctx).toBeDefined();
-    expect(sessionStorage.getItem('blindspot.reload_ctx')).toBeNull();
-
-    const sc = trace.getSpanContext(ctx!);
-    expect(sc?.traceId).toBe(traceId);
-    expect(sc?.spanId).toBe(spanId);
-    expect(sc?.isRemote).toBe(true);
-  });
-
-  it('span started with reloaded context shares traceId with the pre-reload span', () => {
-    history.pushState({}, '', '/before-reload');
-    const preReloadTraceId = getRouteSpan()?.spanContext().traceId;
-    expect(preReloadTraceId).toBeDefined();
-
-    saveRouteContextForReload();
-    const reloadContext = loadRouteContextAfterReload();
-    expect(reloadContext).toBeDefined();
-
-    const span = trace.getTracer('test').startSpan('navigation (none) → /before-reload', {}, reloadContext);
-    expect(span.spanContext().traceId).toBe(preReloadTraceId);
-    span.end();
-  });
 });
 
 describe('initRouting', () => {
