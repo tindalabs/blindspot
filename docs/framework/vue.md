@@ -110,7 +110,7 @@ whole session.
 
 ## Full example
 
-See [`examples/vue-basic/`](https://github.com/blindspot/blindspot/tree/main/examples/vue-basic)
+See [`examples/vue-basic/`](https://github.com/tindalabs/blindspot/tree/main/examples/vue-basic)
 for a working Vite + Vue 3 + Vue Router 4 demo app.
 
 ```bash

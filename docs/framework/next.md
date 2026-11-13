@@ -133,7 +133,7 @@ whole session.
 
 ## Full example
 
-See [`examples/next-app-router/`](https://github.com/blindspot/blindspot/tree/main/examples/next-app-router)
+See [`examples/next-app-router/`](https://github.com/tindalabs/blindspot/tree/main/examples/next-app-router)
 for a working Next.js 14 App Router demo app.
 
 ```bash

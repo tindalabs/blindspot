@@ -123,7 +123,7 @@ is active (e.g. before the first navigation).
 
 ## Full example
 
-See [`examples/react-basic/`](https://github.com/blindspot/blindspot/tree/main/examples/react-basic)
+See [`examples/react-basic/`](https://github.com/tindalabs/blindspot/tree/main/examples/react-basic)
 for a working Vite + React 19 + React Router 7 demo app.
 
 ```bash
