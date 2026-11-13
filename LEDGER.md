@@ -136,3 +136,24 @@ reason.
 
 **Closed when:** the workspace builds, type-checks, and publishes identical public `.d.ts`
 surfaces on TypeScript 6, or a reason to stay on 5.x is recorded here.
+
+## L12: Migrate to OpenTelemetry JS SDK 3 (medium, blocked upstream)
+
+**Where:** the `@opentelemetry/*` dependencies in
+[`packages/core/package.json`](packages/core/package.json) and
+[`packages/web/package.json`](packages/web/package.json), and the Dependabot holds on
+`exporter-trace-otlp-http` (0.300+) and `api` (1.10+)
+
+The OTLP exporter 0.300+ is built on SDK 3 and requires `@opentelemetry/api` ^1.10, but
+`sdk-trace-web` has no stable 3.x yet and its 2.x line rejects api 1.10. We stay on the
+last SDK 2 releases until the browser SDK catches up. `sdk-trace-base` is already a
+deprecated shim over the renamed `@opentelemetry/sdk-trace`.
+
+**Why it matters:** SDK 2 will stop receiving fixes; a security patch that only lands on
+SDK 3 would force an unplanned migration. Raising the api floor to 1.10 also affects
+every consumer, so it needs a changeset that says so.
+
+**Closed when:** a stable `sdk-trace-web` 3 exists, all OTel packages move to the SDK 3
+line together, imports use `@opentelemetry/sdk-trace` instead of `sdk-trace-base`, the
+consumer-facing api peer change is in a changeset, and both Dependabot holds are removed
+in the same PR.
