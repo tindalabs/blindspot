@@ -94,11 +94,19 @@ async function handlePayment() {
 }
 ```
 
-## Session continuity on page reload
+## Page reloads and returning to a tab
 
-When the user hard-reloads a page, Blindspot rehydrates the previous session
-context from `sessionStorage` so the new page load stays within the same trace.
-This happens automatically via the `router` integration — no configuration needed.
+Every page load starts a new trace, including a reload. Blindspot does not continue
+the previous page's trace: that page's route span is sent by a beacon as the page
+unloads, and the beacon can be lost, which would leave the new page's spans as orphans
+with no root. The session is kept instead: `ux.session.id` is a resource attribute held
+in `sessionStorage`, so every trace from the same tab shares it. Query by that
+attribute to see a whole session.
+
+When the user comes back to a hidden tab, Blindspot reopens the current route as a new
+trace with `ux.route.trigger` set to `resume`. Both behaviours are automatic. See
+[OpenTelemetry concepts](/guide/otel-concepts) for why a trace covers one route, not a
+whole session.
 
 ## Full example
 
