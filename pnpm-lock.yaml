@@ -145,8 +145,8 @@ importers:
         version: 5.5.0(@vue/compiler-sfc@3.5.45)(esbuild@0.27.7)(rollup@4.68.3)(vite@6.4.6(@types/node@26.6.6)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.9.0))(vue@3.5.45(typescript@5.9.3))
     devDependencies:
       '@vitejs/plugin-vue':
-        specifier: ^5.2.3
-        version: 5.2.4(vite@6.4.6(@types/node@26.6.6)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.9.0))(vue@3.5.45(typescript@5.9.3))
+        specifier: ^6.0.10
+        version: 6.0.10(vite@6.4.6(@types/node@26.6.6)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.9.0))(vue@3.5.45(typescript@5.9.3))
       vite:
         specifier: ^6.0.0
         version: 6.4.6(@types/node@26.6.6)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.9.0)
@@ -321,8 +321,8 @@ importers:
         version: link:../web
     devDependencies:
       '@vitejs/plugin-vue':
-        specifier: ^5.2.3
-        version: 5.2.4(vite@6.4.6(@types/node@26.6.6)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.9.0))(vue@3.5.45(typescript@5.9.3))
+        specifier: ^6.0.10
+        version: 6.0.10(vite@6.4.6(@types/node@26.6.6)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.9.0))(vue@3.5.45(typescript@5.9.3))
       '@vitest/coverage-v8':
         specifier: ^4.1.8
         version: 4.1.12(vitest@4.1.12)
@@ -1481,12 +1481,14 @@ packages:
   '@opentelemetry/sdk-trace-base@2.7.1':
     resolution: {integrity: sha512-NAYIlsF8MPUsKqJMiDQJTMPOmlbawC1Iz/omMLygZ1C9am8fTKYjTaI+OZM+WTY3t3Glo0wnOg/6/pac6RGPPw==}
     engines: {node: ^18.19.0 || >=20.6.0}
+    deprecated: Use @opentelemetry/sdk-trace package
     peerDependencies:
       '@opentelemetry/api': '>=1.3.0 <1.10.0'
 
   '@opentelemetry/sdk-trace-web@2.7.1':
     resolution: {integrity: sha512-K806OouCSOjMd8Nr7+ZCq3QT22tdAzzS/7h8vprfiKjkgFQ99/dvwU8d12WJANA6D5Qtme65hyBAqAu9CkQuxQ==}
     engines: {node: ^18.19.0 || >=20.6.0}
+    deprecated: Use @opentelemetry/sdk-trace package
     peerDependencies:
       '@opentelemetry/api': '>=1.0.0 <1.10.0'
 
@@ -1880,6 +1882,13 @@ packages:
     peerDependencies:
       vite: ^5.0.0 || ^6.0.0
       vue: ^3.2.25
+
+  '@vitejs/plugin-vue@6.0.10':
+    resolution: {integrity: sha512-b80aUQh3n+qEzzZm5oQp3rT2QImeCx58K6eFl/RkJ3d65KW0kTuv5lNsLRVAjbW9YRUpo/wzmvzMgV34bTAItA==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    peerDependencies:
+      vite: ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
+      vue: ^3.2.25 || ^3.6.0-rc.10
 
   '@vitest/coverage-v8@4.1.12':
     resolution: {integrity: sha512-6S7/iVknKglLAxMFxQGNppBI0iqJS2NgM6FBxavitj7KaDq/vywOWGf6dGu7F2L1Qy0G6S3uTp7aGshHrzK8JA==}
@@ -5015,8 +5024,9 @@ snapshots:
       vite: 5.4.21(@types/node@26.6.6)(lightningcss@1.32.0)
       vue: 3.5.45(typescript@5.9.3)
 
-  '@vitejs/plugin-vue@5.2.4(vite@6.4.6(@types/node@26.6.6)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.9.0))(vue@3.5.45(typescript@5.9.3))':
+  '@vitejs/plugin-vue@6.0.10(vite@6.4.6(@types/node@26.6.6)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.9.0))(vue@3.5.45(typescript@5.9.3))':
     dependencies:
+      '@rolldown/pluginutils': 1.1.1
       vite: 6.4.6(@types/node@26.6.6)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.9.0)
       vue: 3.5.45(typescript@5.9.3)
 
