@@ -71,15 +71,15 @@ Once `init()` is called, every user interaction in the browser automatically
 produces a structured OpenTelemetry span tree:
 
 ```
-Trace (session)
-│
-├── Span: navigation → /checkout          ← root span per route
-│   ├── Span: click "Add to cart"
-│   ├── Span: POST /api/cart              ← correlated with backend via traceparent
-│   └── Span: click "Retry"
-│
-└── Span: navigation → /order-confirm
-    └── Event: lcp (1.2s)
+Trace (one per route)
+└── navigation            ux.route.to=/checkout    ← root span
+    ├── click button      ux.element.label="Add to cart"
+    ├── POST              url.full=/api/cart       ← correlated with backend via traceparent
+    └── click button      ux.element.label="Retry"
+
+Next trace (same session, linked by the ux.session.id resource attribute)
+└── navigation            ux.route.to=/order-confirm
+    (event: lcp 1.2s)
 ```
 
 The `traceparent` W3C header is injected automatically into every fetch call, so

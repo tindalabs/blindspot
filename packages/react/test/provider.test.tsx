@@ -8,7 +8,6 @@ vi.mock('@tindalabs/blindspot', () => ({
   setRouteSpan: vi.fn(),
   clearRouteSpan: vi.fn(),
   getRouteSpan: vi.fn(),
-  loadRouteContextAfterReload: vi.fn(),
 }));
 
 vi.mock('@tindalabs/blindspot-core', () => ({

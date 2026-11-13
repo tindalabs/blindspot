@@ -32,10 +32,10 @@ That's it — auto-instrumentation starts immediately. Point `endpoint` at any O
 
 | Instrumentation | Span | Key attributes |
 |---|---|---|
-| `routing` | `navigation {from} → {to}` | `ux.route.from/to/trigger` |
-| `clicks` | `click {tag}[{label}]` | `ux.element.label`, `ux.rage_click`, `ux.dead_click` |
+| `routing` | `navigation` | `ux.route.from/to/trigger` |
+| `clicks` | `click {tag}` | `ux.element.label`, `ux.rage_click`, `ux.dead_click` |
 | `forms` | `form.submit {name}` | `ux.form.name/valid/attempts` |
-| `fetch` | `{METHOD} {path}` | `http.*`, `ux.api.user_wait_ms`, injected `traceparent` |
+| `fetch` | `{METHOD}` | `http.*`, `ux.api.user_wait_ms`, injected `traceparent` |
 | `vitals` | events on route span | `lcp`, `cls`, `inp` |
 | `errors` | `error.unhandled` | `error.type/message` (sanitized) |
 

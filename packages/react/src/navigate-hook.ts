@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { clearRouteSpan, getTracer, loadRouteContextAfterReload, setRouteSpan } from '@tindalabs/blindspot';
+import { beginRouteSpan } from '@tindalabs/blindspot';
 
 export function useBlindspotNavigate(
   pathname: string,
@@ -20,23 +20,7 @@ export function useBlindspotNavigate(
       prevPath.current === null ? 'initial' : (trigger ?? 'user');
 
     prevPath.current = to;
-    clearRouteSpan();
 
-    const parentContext =
-      effectiveTrigger === 'initial' ? loadRouteContextAfterReload() : undefined;
-
-    const span = getTracer().startSpan(
-      `navigation ${from || '(none)'} → ${to}`,
-      {
-        attributes: {
-          'ux.route.from': from,
-          'ux.route.to': to,
-          'ux.route.trigger': effectiveTrigger,
-        },
-      },
-      parentContext,
-    );
-
-    setRouteSpan(span);
+    beginRouteSpan({ from, to, trigger: effectiveTrigger });
   }, [pathname, search, trigger]);
 }

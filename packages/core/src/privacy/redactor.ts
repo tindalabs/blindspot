@@ -1,4 +1,5 @@
 import type { Attributes, AttributeValue } from '@opentelemetry/api';
+import type { TimedEvent } from '@opentelemetry/sdk-trace-base';
 import type { PrivacyConfig } from '../config.js';
 
 const REDACTED = '[redacted]';
@@ -6,7 +7,10 @@ const REDACTED = '[redacted]';
 function redactValue(value: AttributeValue, patterns: RegExp[]): AttributeValue {
   if (typeof value !== 'string') return value;
   for (const pattern of patterns) {
-    if (pattern.test(value)) return REDACTED;
+    // String#search ignores the /g and /y flags and leaves lastIndex untouched;
+    // RegExp#test on a user-supplied /g pattern would resume from the previous
+    // match position and let every other matching value through.
+    if (value.search(pattern) !== -1) return REDACTED;
   }
   return value;
 }
@@ -34,4 +38,12 @@ export function sanitizeAttributes(attributes: Attributes, config: PrivacyConfig
     }
   }
   return result;
+}
+
+export function sanitizeEvents(events: TimedEvent[], config: PrivacyConfig): TimedEvent[] {
+  return events.map((event) =>
+    event.attributes === undefined
+      ? event
+      : { ...event, attributes: sanitizeAttributes(event.attributes, config) },
+  );
 }

@@ -1,0 +1,159 @@
+# Ledger
+
+Open work: defects, doc drift, and deferred decisions. Each entry states where, what,
+why it matters, and what "closed" means. Close an entry by deleting it in the same commit
+as the fix; git history keeps the record.
+
+Severity: **high** (wrong data or privacy exposure), **medium** (misleading docs or API),
+**low** (naming, polish).
+
+---
+
+## L3: ARCHITECTURE.md says "Session = Trace"; the code does Route = Trace (medium)
+
+**Where:** [`ARCHITECTURE.md`](ARCHITECTURE.md), the "Semantic Model" section and the
+"Key Technical Decisions" row `Session = Trace, Route = root Span`
+
+`routing.ts` starts every navigation span with no parent, so each route is its own trace.
+The session is joined only by the `ux.session.id` **resource** attribute. The code's
+choice is the sound one: a trace that lasts a whole session never completes, breaks
+backend trace-size and duration limits, and makes every fetch's backend trace a
+descendant of one giant tree.
+
+**Why it matters:** trace vs. session is the most common OTel beginner confusion, and
+this doc teaches the wrong answer. Users writing TraceQL against "one trace per session"
+get wrong results.
+
+**Closed when:** the semantic model diagram and decision row describe one trace per
+route, with the session joined by a resource attribute, and the reason. Also fix the
+attribute-taxonomy example in the same section, which shows `ux.session.id` as a span
+attribute (it is a resource attribute) and `http.url` (the code emits the current
+semconv `url.full`).
+
+## L4: Decision table claims wrappers the code does not use (medium)
+
+**Where:** [`ARCHITECTURE.md`](ARCHITECTURE.md), the "Key Technical Decisions" rows for
+`@opentelemetry/instrumentation-fetch` and `@opentelemetry/instrumentation-user-interaction`,
+and the "(wraps OTel fetch)" label in the system diagram
+
+Neither package is a dependency. Fetch and click instrumentation are hand-written in
+`packages/web/src/instrumentations/`. The decision was reversed without a record.
+
+**Closed when:** the table records the actual decision and its reason (likely: control
+over attributes such as `ux.api.triggered_by`, the self-instrumentation guard on the OTLP
+endpoint, and bundle size, but **measure and confirm** rather than assume), and the
+diagram label matches.
+
+## L5: `getSessionTraceparent()` returns the route's traceparent (low)
+
+**Where:** [`packages/web/src/context.ts`](packages/web/src/context.ts), exported from
+`@tindalabs/blindspot` and listed in `CHANGELOG.md`
+
+It returns the traceparent of the current route span, which changes on every navigation.
+The name repeats the L3 confusion. It is public API, so renaming it is a breaking change.
+
+**Closed when:** `getRouteTraceparent()` is added, `getSessionTraceparent()` becomes a
+deprecated alias with a JSDoc `@deprecated` note and a changeset, and it is removed at the
+next minor release.
+
+## L6: `ux.session.id` vs. the semconv `session.id` (low, needs a decision)
+
+**Where:** [`packages/core/src/init.ts`](packages/core/src/init.ts)
+
+OTel semantic conventions define `session.id` (the `session` namespace). `ROADMAP.md`
+commits new UX signals to the `ux.*` namespace, but that rule targets concepts semconv
+does not cover; session identity is already covered. Using a private key means generic
+OTel tooling that understands `session.id` cannot group Blindspot sessions.
+
+**Closed when:** a decision is recorded in ARCHITECTURE.md: emit `session.id` (possibly
+alongside `ux.session.id` for one deprecation cycle), or keep `ux.session.id` with the
+stated reason. Check the convention's current stability level before deciding.
+
+## L7: Route templates for navigation and fetch spans (low)
+
+**Where:** the adapters in `packages/{react,vue,svelte,next}/src/`, and
+[`packages/web/src/context.ts`](packages/web/src/context.ts) (`beginRouteSpan`)
+
+Route spans are named `navigation` and fetch spans just `{method}`, because raw paths
+are high-cardinality and can carry PII. Several routers know the route *template*
+(Vue `to.matched`, SvelteKit `route.id`, React Router matches), which is
+low-cardinality and free of user data. Semconv allows `{method} {url.template}` for
+HTTP client spans, and a `ux.route.template` attribute would let dashboards group
+routes without regexes over paths.
+
+**Closed when:** a decision is recorded on whether to add an optional `template` to
+`RouteChange` (attribute only, or also in the name), and the adapters that can supply
+one do, with tests. Vanilla routing and Next App Router have no template, so they keep
+the plain name.
+
+## L8: Audit ignores GHSA-587h-7wmj-h5pm (vite 5, dev server only) (low)
+
+**Where:** `pnpm.auditConfig.ignoreGhsas` in [`package.json`](package.json)
+
+The advisory (a `launch-editor` file-existence check bypass on Windows, reachable through
+the vite dev server) has no patched vite 5.x release. vite 5 comes from `vitepress` 1.x
+(the docs site), which depends on it. It never ships in a published package, and the CI
+audit gate would otherwise stay red with nothing to upgrade to.
+
+**Closed when:** the docs move to a vitepress release built on a patched vite (2.x at the
+time of writing), and the ignore entry is removed in the same commit. Re-check with
+`pnpm audit` after removing it.
+
+## L9: Migrate to Changesets v3 and `changesets/action` v2 together (medium)
+
+**Where:** [`release.yml`](.github/workflows/release.yml), `@changesets/cli` in
+[`package.json`](package.json), the Dependabot ignore for `changesets/action` majors
+
+Action v2 refuses to run with CLI v2, renames the `publish`/`title`/`commit` inputs, and
+needs the token as the `github-token` input instead of `GITHUB_TOKEN` in `env`. Bumping
+either alone breaks releases. The workflow only runs on push to main, so PR CI cannot
+catch it. Dependabot PR #41 was closed for this reason.
+
+**Closed when:** the CLI and action are upgraded in one PR. Before merging, check the new
+input names, the `CHANGESETS_OUTPUT` requirement for custom scripts, and that Trusted
+Publishing still works (a dry run of the version step on a branch). The Dependabot ignore
+is removed in the same PR.
+
+## L10: Decide the supported Next range, including Next 16 (medium, needs a decision)
+
+**Where:** `next` peer range in [`packages/next/package.json`](packages/next/package.json),
+[`examples/next-app-router`](examples/next-app-router)
+
+Main is on the latest 15.5.x. Next 16 is a major release of a peer dependency, so
+supporting it is a product decision (widen the peer range, test both, or drop 15), not a
+lockfile bump. Dependabot PR #36 was closed for this reason.
+
+**Closed when:** the decision is recorded, the peer range reflects it, and the adapter
+tests and e2e run against every supported major.
+
+## L11: TypeScript 6 (low)
+
+**Where:** `typescript` across the workspace
+
+A major toolchain change with new defaults and deprecations; it needs its own pass over
+every `tsconfig` and the emitted declaration files. Dependabot PR #24 was closed for this
+reason.
+
+**Closed when:** the workspace builds, type-checks, and publishes identical public `.d.ts`
+surfaces on TypeScript 6, or a reason to stay on 5.x is recorded here.
+
+## L12: Migrate to OpenTelemetry JS SDK 3 (medium, blocked upstream)
+
+**Where:** the `@opentelemetry/*` dependencies in
+[`packages/core/package.json`](packages/core/package.json) and
+[`packages/web/package.json`](packages/web/package.json), and the Dependabot holds on
+`exporter-trace-otlp-http` (0.300+) and `api` (1.10+)
+
+The OTLP exporter 0.300+ is built on SDK 3 and requires `@opentelemetry/api` ^1.10, but
+`sdk-trace-web` has no stable 3.x yet and its 2.x line rejects api 1.10. We stay on the
+last SDK 2 releases until the browser SDK catches up. `sdk-trace-base` is already a
+deprecated shim over the renamed `@opentelemetry/sdk-trace`.
+
+**Why it matters:** SDK 2 will stop receiving fixes; a security patch that only lands on
+SDK 3 would force an unplanned migration. Raising the api floor to 1.10 also affects
+every consumer, so it needs a changeset that says so.
+
+**Closed when:** a stable `sdk-trace-web` 3 exists, all OTel packages move to the SDK 3
+line together, imports use `@opentelemetry/sdk-trace` instead of `sdk-trace-base`, the
+consumer-facing api peer change is in a changeset, and both Dependabot holds are removed
+in the same PR.

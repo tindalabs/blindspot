@@ -25,7 +25,10 @@ test.describe('vue-basic — navigation spans', () => {
     await flushSpans(page);
 
     const span = await otlp.waitForSpan(
-      (s) => s.name === 'navigation (none) → /' && s.attributes['ux.route.trigger'] === 'initial',
+      (s) =>
+        s.name === 'navigation' &&
+        s.attributes['ux.route.to'] === '/' &&
+        s.attributes['ux.route.trigger'] === 'initial',
     );
     expect(span.attributes['ux.route.to']).toBe('/');
     expect(span.attributes['ux.route.from']).toBe('');
@@ -41,7 +44,12 @@ test.describe('vue-basic — navigation spans', () => {
     await page.click('[data-blindspot-label="nav-about"]');
     await flushSpans(page);
 
-    const span = await otlp.waitForSpan((s) => s.name === 'navigation / → /tasks');
+    const span = await otlp.waitForSpan(
+      (s) =>
+        s.name === 'navigation' &&
+        s.attributes['ux.route.from'] === '/' &&
+        s.attributes['ux.route.to'] === '/tasks',
+    );
     expect(span.attributes['ux.route.from']).toBe('/');
     expect(span.attributes['ux.route.to']).toBe('/tasks');
     expect(span.attributes['ux.route.trigger']).toBe('user');
@@ -108,7 +116,9 @@ test.describe('vue-basic — network spans', () => {
     ]);
     await flushSpans(page);
 
-    const span = await otlp.waitForSpan((s) => s.name === 'GET /todos/1');
+    const span = await otlp.waitForSpan(
+      (s) => s.name === 'GET' && String(s.attributes['url.full']).endsWith('/todos/1'),
+    );
     expect(span.attributes['http.request.method']).toBe('GET');
     expect(Number(span.attributes['http.response.status_code'])).toBe(200);
     expect(String(span.attributes['url.full'])).toContain('jsonplaceholder.typicode.com');

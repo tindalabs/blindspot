@@ -59,7 +59,7 @@ init({
 | `serviceName` | `string` | — | Identifies your app in traces |
 | `privacy.maskInputs` | `boolean` | `true` | Block all input content from being captured |
 | `privacy.blockSelectors` | `string[]` | `[]` | CSS selectors for elements to exclude entirely |
-| `privacy.piiPatterns` | `RegExp[]` | `[]` | Patterns stripped from all attribute values |
+| `privacy.piiPatterns` | `RegExp[]` | `[]` | Patterns stripped from all span and span-event attribute values |
 | `privacy.consentRequired` | `boolean` | `false` | Buffer spans until `grantConsent()` is called |
 | `sampling.rate` | `number` | `1.0` | Fraction of sessions to export (0–1) |
 | `instrument.*` | `boolean` | `true` | Toggle individual auto-instrumentations |
@@ -214,9 +214,9 @@ Spans emitted automatically when their instrumentation is enabled.
 
 | Instrumentation | Span name pattern | Key attributes |
 |---|---|---|
-| `routing` | `navigation {from} → {to}` | `ux.route.from`, `ux.route.to`, `ux.route.trigger` |
-| `clicks` | `click {tag}[{label}]` | `ux.interaction.type`, `ux.element.label`, `ux.rage_click`, `ux.dead_click` |
+| `routing` | `navigation` | `ux.route.from`, `ux.route.to`, `ux.route.trigger` |
+| `clicks` | `click {tag}` | `ux.interaction.type`, `ux.element.label`, `ux.rage_click`, `ux.dead_click` |
 | `forms` | `form.submit {name}` | `ux.form.name`, `ux.form.valid`, `ux.form.attempts` |
-| `fetch` | `{METHOD} {path}` | `http.method`, `http.url`, `http.status_code`, `ux.api.user_wait_ms` |
+| `fetch` | `{METHOD}` | `http.request.method`, `url.full`, `http.response.status_code`, `ux.api.user_wait_ms`, `ux.api.triggered_by` |
 | `vitals` | Events on route span | `lcp`, `cls`, `inp` values as span events |
 | `errors` | `error.unhandled` | `error.type`, `error.message`, `error.stack` (sanitized) |

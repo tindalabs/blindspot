@@ -1,9 +1,4 @@
-import {
-  getTracer,
-  setRouteSpan,
-  clearRouteSpan,
-  loadRouteContextAfterReload,
-} from '@tindalabs/blindspot';
+import { beginRouteSpan } from '@tindalabs/blindspot';
 
 export interface NavigationLocation {
   url: { pathname: string; search: string };
@@ -36,22 +31,7 @@ export function installBlindspotRouter(hooks: NavigationHooks): void {
     // span is active at all times. Clearing in a separate beforeNavigate left a
     // window where getRouteContext() was root — in-route clicks/fetch/errors
     // fired in that gap orphaned into their own root trace instead of nesting.
-    clearRouteSpan();
-
-    const parentContext =
-      trigger === 'initial' ? loadRouteContextAfterReload() : undefined;
-    const span = getTracer().startSpan(
-      `navigation ${prevPath || '(none)'} → ${toPath}`,
-      {
-        attributes: {
-          'ux.route.from': prevPath,
-          'ux.route.to': toPath,
-          'ux.route.trigger': trigger,
-        },
-      },
-      parentContext,
-    );
-    setRouteSpan(span);
+    beginRouteSpan({ from: prevPath, to: toPath, trigger });
     prevPath = toPath;
   });
 }

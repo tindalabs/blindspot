@@ -1,11 +1,11 @@
 import { getProcessor } from '@tindalabs/blindspot-core';
 import type { ResolvedConfig } from '@tindalabs/blindspot-core';
-import { clearRouteSpan } from '../context.js';
+import { resumeRouteSpan, suspendRouteSpan } from '../context.js';
 import type { BeaconExporter } from '../beacon.js';
 
 export function initLifecycle(_config: ResolvedConfig, beaconExporter: BeaconExporter): void {
   const flush = (): void => {
-    clearRouteSpan();
+    suspendRouteSpan();
     if (_config.sampling.errorAware) {
       getProcessor()?.commitSession(_config.sampling.rate);
     }
@@ -15,7 +15,13 @@ export function initLifecycle(_config: ResolvedConfig, beaconExporter: BeaconExp
 
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') flush();
+    else resumeRouteSpan();
   });
 
   window.addEventListener('pagehide', flush);
+
+  // A page restored from the back/forward cache fires pageshow, not a fresh init().
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted) resumeRouteSpan();
+  });
 }

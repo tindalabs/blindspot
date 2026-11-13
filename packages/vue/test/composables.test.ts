@@ -15,7 +15,6 @@ vi.mock('@tindalabs/blindspot', () => ({
   getRouteSpan: mockGetRouteSpan,
   getRouteContext: mockGetRouteContext,
   getTracer: vi.fn().mockReturnValue({ startSpan: mockStartSpan }),
-  loadRouteContextAfterReload: vi.fn(),
 }));
 
 import { useBlindspot } from '../src/composables.js';

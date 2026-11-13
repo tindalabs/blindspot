@@ -37,10 +37,12 @@ afterEach(() => {
 });
 
 describe('initFetch — span shape', () => {
-  it('creates a span named "<METHOD> <pathname>" with request attributes', async () => {
+  it('names the span by HTTP method only and keeps the URL in attributes', async () => {
+    // Semconv HTTP client span name without a url.template is "{method}"; the raw
+    // path is high-cardinality and may carry identifiers.
     await window.fetch('/api/users?page=2');
     const [span] = exporter.getFinishedSpans();
-    expect(span.name).toBe('GET /api/users');
+    expect(span.name).toBe('GET');
     expect(span.attributes['http.request.method']).toBe('GET');
     expect(span.attributes['url.full']).toBe('/api/users?page=2');
   });
@@ -49,7 +51,7 @@ describe('initFetch — span shape', () => {
     await window.fetch('/api/orders', { method: 'post' });
     const [span] = exporter.getFinishedSpans();
     expect(span.attributes['http.request.method']).toBe('POST');
-    expect(span.name).toBe('POST /api/orders');
+    expect(span.name).toBe('POST');
   });
 
   it('tags the span with the last interaction label that triggered it', async () => {
@@ -138,7 +140,7 @@ describe('initFetch — input types', () => {
   it('instruments a URL-object input', async () => {
     await window.fetch(new URL('https://api.example.com/things'));
     const [span] = exporter.getFinishedSpans();
-    expect(span.name).toBe('GET /things');
+    expect(span.name).toBe('GET');
     expect(span.attributes['url.full']).toBe('https://api.example.com/things');
   });
 
@@ -146,19 +148,19 @@ describe('initFetch — input types', () => {
     await window.fetch(new Request('/api/orders', { method: 'POST' }));
     const [span] = exporter.getFinishedSpans();
     expect(span.attributes['http.request.method']).toBe('POST');
-    expect(span.name).toBe('POST /api/orders');
+    expect(span.name).toBe('POST');
     // The wrapper re-wraps the Request so the injected traceparent rides along.
     expect((lastInit?.headers as Record<string, string>).traceparent).toBeDefined();
   });
 });
 
 describe('initFetch — malformed URL', () => {
-  it('falls back to the raw URL in the span name when URL parsing throws', async () => {
+  it('still instruments the request when URL parsing throws', async () => {
     await window.fetch('http://[malformed');
     const [span] = exporter.getFinishedSpans();
-    // getPathname() and the self-instrumentation guard both swallow the parse
-    // error; the request is still instrumented using the raw URL string.
-    expect(span.name).toBe('GET http://[malformed');
+    // The self-instrumentation guard swallows the parse error; the request is
+    // still instrumented, with the raw URL string kept in url.full.
+    expect(span.name).toBe('GET');
     expect(span.attributes['url.full']).toBe('http://[malformed');
     expect((lastInit?.headers as Record<string, string>).traceparent).toBeDefined();
   });

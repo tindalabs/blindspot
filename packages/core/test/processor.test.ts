@@ -1,7 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
-import { SpanStatusCode } from '@opentelemetry/api';
+import { SpanStatusCode, type Span } from '@opentelemetry/api';
 import { BlindspotSpanProcessor } from '../src/processor.js';
-import type { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
+import {
+  BasicTracerProvider,
+  InMemorySpanExporter,
+  type ReadableSpan,
+  type SpanExporter,
+} from '@opentelemetry/sdk-trace-base';
 import type { ResolvedConfig } from '../src/config.js';
 
 function makeConfig(overrides: Partial<ResolvedConfig['sampling']> = {}): ResolvedConfig {
@@ -189,5 +194,73 @@ describe('BlindspotSpanProcessor — errorAware mode', () => {
     proc.consentGate.grant(); // error span routes through _route → hasError = true → immediate flush
     await proc.forceFlush();
     expect(exporter.exported).toHaveLength(1);
+  });
+});
+
+// ─── Privacy: span events ────────────────────────────────────────────────────
+// Events carry user-derived strings too (exception messages and stack traces from
+// recordException, custom recordEvent payloads), so they must get the same
+// redaction as span attributes before export.
+
+describe('BlindspotSpanProcessor — event redaction', () => {
+  const EMAIL = /[\w.+-]+@[\w-]+\.\w{2,}/;
+
+  async function exportThroughProcessor(
+    privacy: Partial<ResolvedConfig['privacy']>,
+    record: (span: Span) => void,
+  ): Promise<ReadableSpan> {
+    const config = makeConfig();
+    config.privacy = { ...config.privacy, ...privacy };
+    const exporter = new InMemorySpanExporter();
+    const provider = new BasicTracerProvider({
+      spanProcessors: [new BlindspotSpanProcessor(exporter, config)],
+    });
+    const span = provider.getTracer('test').startSpan('op');
+    record(span);
+    span.end();
+    // BlindspotSpanProcessor wraps a BatchSpanProcessor; flush to reach the exporter.
+    await provider.forceFlush();
+    const [exported] = exporter.getFinishedSpans();
+    return exported;
+  }
+
+  it('redacts piiPatterns matches in recordException messages and stack traces', async () => {
+    const error = new Error('lookup failed for alice@example.com');
+    error.stack = 'Error: lookup failed for alice@example.com\n    at load (app.js:1:1)';
+    const exported = await exportThroughProcessor({ piiPatterns: [EMAIL] }, (span) =>
+      span.recordException(error),
+    );
+    const exception = exported.events.find((e) => e.name === 'exception');
+    expect(exception?.attributes?.['exception.message']).toBe('[redacted]');
+    expect(exception?.attributes?.['exception.stacktrace']).toBe('[redacted]');
+    expect(exception?.attributes?.['exception.type']).toBe('Error');
+  });
+
+  it('redacts piiPatterns matches in custom event attributes', async () => {
+    const exported = await exportThroughProcessor({ piiPatterns: [EMAIL] }, (span) =>
+      span.addEvent('signup', { contact: 'bob@example.com', step: 2 }),
+    );
+    const [event] = exported.events;
+    expect(event.attributes?.['contact']).toBe('[redacted]');
+    expect(event.attributes?.['step']).toBe(2);
+  });
+
+  it('strips scrubAttributes keys from event attributes', async () => {
+    const exported = await exportThroughProcessor({ scrubAttributes: ['auth.token'] }, (span) =>
+      span.addEvent('retry', { 'auth.token': 'bearer-xyz', attempt: 3 }),
+    );
+    const [event] = exported.events;
+    expect(event.attributes).not.toHaveProperty('auth.token');
+    expect(event.attributes?.['attempt']).toBe(3);
+  });
+
+  it('preserves event names, timestamps and attribute-less events', async () => {
+    const exported = await exportThroughProcessor({ piiPatterns: [EMAIL] }, (span) =>
+      span.addEvent('lcp'),
+    );
+    const [event] = exported.events;
+    expect(event.name).toBe('lcp');
+    expect(event.time).toHaveLength(2);
+    expect(event.attributes ?? {}).toEqual({});
   });
 });

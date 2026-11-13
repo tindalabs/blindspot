@@ -7,14 +7,16 @@ import {
   type SpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import type { ResolvedConfig } from './config.js';
-import { sanitizeAttributes } from './privacy/redactor.js';
+import { sanitizeAttributes, sanitizeEvents } from './privacy/redactor.js';
 import { ConsentGate } from './privacy/consent.js';
 
 function sanitizedView(span: ReadableSpan, config: ResolvedConfig): ReadableSpan {
   const sanitizedAttributes = sanitizeAttributes(span.attributes, config.privacy);
+  const sanitizedEvents = sanitizeEvents(span.events, config.privacy);
   return new Proxy(span, {
     get(target, prop: string | symbol) {
       if (prop === 'attributes') return sanitizedAttributes;
+      if (prop === 'events') return sanitizedEvents;
       const val = (target as unknown as Record<string | symbol, unknown>)[prop];
       return typeof val === 'function' ? (val as (...a: unknown[]) => unknown).bind(target) : val;
     },
