@@ -74,7 +74,7 @@
   },
   "devDependencies": {
     "@opentelemetry/sdk-trace-web": "^2.12.1",
-    "@size-limit/file": "^12.1.0",
+    "@size-limit/file": "^14.3.0",
     "@vitest/coverage-v8": "^4.1.8",
     "happy-dom": "^21.0.4",
     "size-limit": "^12.1.0",
