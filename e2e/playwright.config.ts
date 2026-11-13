@@ -6,8 +6,12 @@ export default defineConfig({
   workers: 1,
   retries: process.env['CI'] ? 1 : 0,
   timeout: 20_000,
+  // CI uploads the HTML report when a run fails; the trace from the retry is
+  // the only way to see what the page did on a runner nobody can watch.
+  reporter: process.env['CI'] ? [['list'], ['html', { open: 'never' }]] : 'list',
   use: {
     headless: true,
+    trace: 'on-first-retry',
   },
   projects: [
     // ── Chrome (primary) ───────────────────────────────────────────────────────
@@ -38,9 +42,8 @@ export default defineConfig({
       use: { ...devices['Desktop Firefox'], baseURL: 'http://localhost:5175' },
     },
     // ── WebKit (Safari engine) ─────────────────────────────────────────────────
-    // Playwright WebKit on Linux cannot reach Vite dev servers ("internal error").
-    // This project runs in CI on macOS where the native WebKit engine is used.
-    // Omitted on Linux to keep local dev green.
+    // Playwright WebKit on Linux cannot reach Vite dev servers ("internal error"),
+    // so this project exists only on macOS, where CI runs it in its own job.
     ...(process.platform === 'darwin' ? [{
       name: 'react-webkit',
       testMatch: 'react.spec.ts',

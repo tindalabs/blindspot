@@ -164,20 +164,6 @@ reporting on web-vitals 6, or keep page-level values and label them as such, for
 with an attribute), it is implemented with an e2e test that navigates between routes,
 and #62 is merged or closed to match.
 
-## L14: CI does not run the e2e suite (medium)
-
-**Where:** [`.github/workflows/ci.yml`](.github/workflows/ci.yml),
-[`e2e/playwright.config.ts`](e2e/playwright.config.ts)
-
-No workflow runs Playwright, so the e2e specs (the only tests that exercise the SDK in
-real browsers, including the web-vitals page-hide ordering) guard nothing unless someone
-runs `pnpm e2e` locally. The config's WebKit comment says that project "runs in CI on
-macOS", which is not true.
-
-**Closed when:** a CI job installs the browsers and runs the e2e suite on pull requests
-(Chromium and Firefox on Linux at least; WebKit on macOS if its cost is acceptable,
-measured), and the config comment matches what CI actually runs.
-
 ## L15: React 19 is allowed by the peer range but never tested (medium, needs a decision)
 
 **Where:** the `react: ">=18"` peer in [`packages/react/package.json`](packages/react/package.json)

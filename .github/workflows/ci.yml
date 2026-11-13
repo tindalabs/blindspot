@@ -46,3 +46,57 @@ jobs:
 
       - name: Audit
         run: pnpm audit --audit-level=high
+
+  # The only tests that run the SDK in real browsers (page-hide ordering, beacon
+  # export, adapter routing). A separate job so it runs alongside `ci`.
+  e2e:
+    name: e2e (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Every project except WebKit, which playwright.config.ts leaves out on
+          # Linux because Playwright's Linux WebKit cannot reach the Vite servers.
+          - os: ubuntu-latest
+            browsers: chromium firefox
+            projects: ''
+          - os: macos-latest
+            browsers: webkit
+            projects: --project=react-webkit
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 9.15.4
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # The examples import the workspace packages from their built output.
+      - name: Build
+        run: pnpm build
+
+      # Not cached: Playwright advises against it, since restoring takes about as
+      # long as downloading and the OS dependencies are not part of the cache.
+      - name: Install browsers
+        run: pnpm --filter @tindalabs/blindspot-e2e exec playwright install --with-deps ${{ matrix.browsers }}
+
+      # A Vite "http proxy error ... 127.0.0.1:4318" in the log is expected: no
+      # collector runs here, and the tests read spans from the page, not the proxy.
+      - name: Run e2e
+        run: pnpm e2e ${{ matrix.projects }}
+
+      - name: Upload report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report-${{ matrix.os }}
+          path: e2e/playwright-report
+          retention-days: 7
