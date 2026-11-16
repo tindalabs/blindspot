@@ -69,9 +69,12 @@ function parseBody(raw: string): Span[] {
 export async function setupPage(page: Page): Promise<void> {
   await page.addInitScript(() => {
     navigator.sendBeacon = (url: string | URL, data?: BodyInit | null): boolean => {
+      // The SDK sends a Blob, and Playwright cannot read a Blob request body on
+      // WebKit (postData() is null), so the body is sent as text instead.
+      const body = data instanceof Blob ? data.text() : Promise.resolve(data ?? null);
       // A failed request is not swallowed: the interceptor records it through
       // the page's `requestfailed` event and fails the test.
-      void fetch(url, { method: 'POST', body: data ?? null, keepalive: true });
+      void body.then((text) => fetch(url, { method: 'POST', body: text, keepalive: true }));
       return true;
     };
   });
