@@ -1,7 +1,7 @@
 # React Integration
 
 `@tindalabs/blindspot-react` provides a provider, routing components, and hooks for
-React applications. It works with React Router v6 out of the box and exposes
+React applications. It works with React Router v6 and v7 out of the box and exposes
 a generic hook for TanStack Router and other routers.
 
 ## Installation
@@ -40,14 +40,20 @@ function App() {
 The provider is idempotent — calling `init()` more than once is safe (subsequent
 calls are no-ops).
 
-## Route tracing — React Router v6
+## Route tracing: React Router v6 and v7
 
 `<BlindspotRoutes>` is a drop-in replacement for `<Routes>`. It creates a root
-span on every navigation and ends the previous one.
+span on every navigation and ends the previous one. It is exported from the
+`/react-router` subpath, so apps that do not use React Router never load it.
+
+It imports from `react-router-dom`, which is an optional peer (`^6 || ^7`). React
+Router v7 also ships as the `react-router` package; a v7 app that installed only
+`react-router` must add `react-router-dom` as well.
 
 ```tsx
 import { BrowserRouter, Route } from 'react-router-dom'
-import { BlindspotProvider, BlindspotRoutes } from '@tindalabs/blindspot-react'
+import { BlindspotProvider } from '@tindalabs/blindspot-react'
+import { BlindspotRoutes } from '@tindalabs/blindspot-react/react-router'
 
 function App() {
   return (
@@ -64,13 +70,7 @@ function App() {
 }
 ```
 
-Or use the dedicated subpath import:
-
-```tsx
-import { BlindspotRoutes } from '@tindalabs/blindspot-react/react-router'
-```
-
-## Route tracing — TanStack Router and others
+## Route tracing: TanStack Router and others
 
 Use `useBlindspotNavigate` to open a route span manually. Call it inside your
 layout component on every path change:

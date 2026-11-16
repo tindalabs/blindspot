@@ -166,3 +166,57 @@ jobs:
           name: playwright-report-react-18
           path: e2e/playwright-report
           retention-days: 7
+
+  # The react adapter's `./react-router` entry declares `react-router-dom: ^6 || ^7`,
+  # but the workspace develops on 7. This job forces 6 and reruns what the router
+  # touches: an API that only 7 exports passes everywhere else and fails here.
+  react-router-6:
+    name: react-router 6
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 9.15.4
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+          cache: pnpm
+
+      - name: Install dependencies with React Router 6
+        run: |
+          pnpm pkg set 'pnpm.overrides.react-router-dom=^6.30.6'
+          pnpm install --no-frozen-lockfile
+
+      # Without this, an override that stopped applying would leave the job
+      # testing 7 again while still passing.
+      - name: Assert React Router 6 is what resolved
+        run: |
+          for consumer in packages/react examples/react-basic; do
+            version=$(node -p "require(require.resolve('react-router-dom/package.json', { paths: ['$consumer'] })).version")
+            echo "$consumer: react-router-dom@$version"
+            case "$version" in 6.*) ;; *) echo "::error::$consumer resolved react-router-dom@$version, expected 6.x"; exit 1 ;; esac
+          done
+
+      - name: Build
+        run: pnpm build
+
+      - name: Type check and test the React adapter and example
+        run: pnpm turbo type-check test --filter=@tindalabs/blindspot-react --filter=@tindalabs/blindspot-example-react-basic
+
+      - name: Install browsers
+        run: pnpm --filter @tindalabs/blindspot-e2e exec playwright install --with-deps chromium firefox
+
+      # Only the React example routes with React Router; Vue and Next do not.
+      - name: Run e2e
+        run: pnpm e2e --project=react --project=react-firefox
+
+      - name: Upload report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report-react-router-6
+          path: e2e/playwright-report
+          retention-days: 7

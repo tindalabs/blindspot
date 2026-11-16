@@ -19,7 +19,7 @@ required.
 npm install @tindalabs/blindspot
 
 # Framework integrations — pick the one that matches your stack
-npm install @tindalabs/blindspot-react   # React + React Router v6 / TanStack Router
+npm install @tindalabs/blindspot-react   # React + React Router v6 or v7 / TanStack Router
 npm install @tindalabs/blindspot-vue     # Vue 3 + Vue Router 4
 npm install @tindalabs/blindspot-next    # Next.js App Router or Pages Router
 ```

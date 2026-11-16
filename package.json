@@ -12,7 +12,7 @@
     "docs:preview": "pnpm --filter @tindalabs/blindspot-docs preview",
     "size": "pnpm --filter @tindalabs/blindspot build && pnpm --filter @tindalabs/blindspot size",
     "e2e": "pnpm --filter @tindalabs/blindspot-e2e e2e",
-    "lint:package": "turbo lint:package"
+    "lint:package": "node scripts/check-peer-meta.mjs && turbo lint:package"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",

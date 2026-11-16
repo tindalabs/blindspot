@@ -8,7 +8,4 @@ export default defineConfig({
       reporter: ['text', 'lcov'],
     },
   },
-  esbuild: {
-    jsx: 'automatic',
-  },
 });

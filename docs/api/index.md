@@ -138,7 +138,8 @@ Initialises the SDK and provides span context to child components. Idempotent.
 
 ### `<BlindspotRoutes>`
 
-Drop-in for React Router v6 `<Routes>`. Creates a root span on every navigation.
+Drop-in for React Router v6 and v7 `<Routes>`, exported from
+`@tindalabs/blindspot-react/react-router`. Creates a root span on every navigation.
 
 ### `useBlindspotNavigate(pathname, search?, trigger?)`
 
