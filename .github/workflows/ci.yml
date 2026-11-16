@@ -88,13 +88,16 @@ jobs:
       - name: Install browsers
         run: pnpm --filter @tindalabs/blindspot-e2e exec playwright install --with-deps ${{ matrix.browsers }}
 
-      # A Vite "http proxy error ... 127.0.0.1:4318" in the log is expected: no
-      # collector runs here, and the tests read spans from the page, not the proxy.
+      # The tests intercept every export, so a Vite "http proxy error: /v1/traces"
+      # means a span was still unexported when a test closed its page: usually the
+      # test failed waiting for it. No collector runs here to receive it.
       - name: Run e2e
         run: pnpm e2e ${{ matrix.projects }}
 
+      # Also on success: a flaky test passes the job on retry, and its failed
+      # attempt's trace is in this report.
       - name: Upload report
-        if: failure()
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7
         with:
           name: playwright-report-${{ matrix.os }}
@@ -157,7 +160,7 @@ jobs:
         run: pnpm e2e --project=react --project=react-firefox --project=next
 
       - name: Upload report
-        if: failure()
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7
         with:
           name: playwright-report-react-18

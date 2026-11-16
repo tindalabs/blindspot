@@ -6,12 +6,14 @@ export default defineConfig({
   workers: 1,
   retries: process.env['CI'] ? 1 : 0,
   timeout: 20_000,
-  // CI uploads the HTML report when a run fails; the trace from the retry is
-  // the only way to see what the page did on a runner nobody can watch.
+  // CI uploads the HTML report; a trace is the only way to see what the page did
+  // on a runner nobody can watch.
   reporter: process.env['CI'] ? [['list'], ['html', { open: 'never' }]] : 'list',
   use: {
     headless: true,
-    trace: 'on-first-retry',
+    // The trace must be from the attempt that failed. 'on-first-retry' records
+    // only the retry, which for a flaky test is the attempt that passed.
+    trace: 'retain-on-failure',
   },
   projects: [
     // ── Chrome (primary) ───────────────────────────────────────────────────────

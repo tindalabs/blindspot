@@ -31,7 +31,7 @@ function parseValue(v: Record<string, unknown>): unknown {
 
 function parseAttrs(attrs: OtlpAttr[] = []): Record<string, unknown> {
   const out: Record<string, unknown> = {};
-  for (const a of attrs) out[a.key] = parseValue(a.value as Record<string, unknown>);
+  for (const a of attrs) out[a.key] = parseValue(a.value);
   return out;
 }
 
@@ -60,72 +60,6 @@ function parseBody(raw: string): Span[] {
   return spans;
 }
 
-// ── Interceptor ────────────────────────────────────────────────────────────────
-
-type Listener = (span: Span) => void;
-
-export interface OtlpInterceptor {
-  getSpans(): Span[];
-  waitForSpan(predicate: (s: Span) => boolean, timeoutMs?: number): Promise<Span>;
-}
-
-/**
- * Installs a page.route() handler that captures every span sent to /v1/traces.
- * Must be called before page.goto().
- */
-export function installOtlpInterceptor(page: Page): OtlpInterceptor {
-  const captured: Span[] = [];
-  const listeners: Listener[] = [];
-
-  void page.route('**/v1/traces', async (route) => {
-    try {
-      const raw = route.request().postData();
-      if (raw) {
-        const newSpans = parseBody(raw);
-        for (const span of newSpans) {
-          captured.push(span);
-          for (const l of [...listeners]) l(span);
-        }
-      }
-    } catch {
-      // ignore parse errors — still fulfill so the SDK doesn't stall
-    }
-    await route.fulfill({ status: 200, body: '{}', contentType: 'application/json' });
-  });
-
-  return {
-    getSpans: () => [...captured],
-
-    waitForSpan(predicate, timeoutMs = 5_000): Promise<Span> {
-      const found = captured.find(predicate);
-      if (found) return Promise.resolve(found);
-
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          const idx = listeners.indexOf(listener);
-          if (idx >= 0) listeners.splice(idx, 1);
-          reject(
-            new Error(
-              `waitForSpan timed out after ${timeoutMs}ms.\n` +
-                `Captured spans: ${JSON.stringify(captured.map((s) => s.name))}`,
-            ),
-          );
-        }, timeoutMs);
-
-        const listener: Listener = (s) => {
-          if (predicate(s)) {
-            clearTimeout(timer);
-            const idx = listeners.indexOf(listener);
-            if (idx >= 0) listeners.splice(idx, 1);
-            resolve(s);
-          }
-        };
-        listeners.push(listener);
-      });
-    },
-  };
-}
-
 // ── Page setup ─────────────────────────────────────────────────────────────────
 
 /**
@@ -134,21 +68,23 @@ export function installOtlpInterceptor(page: Page): OtlpInterceptor {
  */
 export async function setupPage(page: Page): Promise<void> {
   await page.addInitScript(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (navigator as any).sendBeacon = (url: string, data?: BodyInit | null) => {
-      fetch(url, { method: 'POST', body: data as BodyInit, keepalive: true }).catch(() => {});
+    navigator.sendBeacon = (url: string | URL, data?: BodyInit | null): boolean => {
+      // The SDK sends a Blob, and Playwright cannot read a Blob request body on
+      // WebKit (postData() is null), so the body is sent as text instead.
+      const body = data instanceof Blob ? data.text() : Promise.resolve(data ?? null);
+      // A failed request is not swallowed: the interceptor records it through
+      // the page's `requestfailed` event and fails the test.
+      void body.then((text) => fetch(url, { method: 'POST', body: text, keepalive: true }));
       return true;
     };
   });
 }
 
 /**
- * Trigger the SDK's page-hide flush: dispatches visibilitychange → hidden,
- * which causes the lifecycle handler to end the active route span and call
- * processor.forceFlush(). Use after actions to export spans immediately
- * instead of waiting for the BatchSpanProcessor's 5-second schedule.
+ * Hide the page the way the SDK sees it: the lifecycle handler ends the active
+ * route span and flushes every ended span through the beacon.
  */
-export async function flushSpans(page: Page): Promise<void> {
+async function hidePage(page: Page): Promise<void> {
   await page.evaluate(() => {
     Object.defineProperty(document, 'visibilityState', {
       get: () => 'hidden',
@@ -156,4 +92,77 @@ export async function flushSpans(page: Page): Promise<void> {
     });
     document.dispatchEvent(new Event('visibilitychange'));
   });
+}
+
+// ── Interceptor ────────────────────────────────────────────────────────────────
+
+const OTLP_ROUTE = '**/v1/traces';
+const DEFAULT_TIMEOUT_MS = 5_000;
+// Long enough for a beacon to reach the route handler, short enough that a span
+// ending late (a route span from a deferred effect) is flushed on the next hide.
+const POLL_INTERVAL_MS = 100;
+
+export interface OtlpInterceptor {
+  /**
+   * Hide the page until a span matching `predicate` is exported, then return it.
+   *
+   * One hide is not enough: a span that ends after it (a framework effect that
+   * runs late, a deferred error) stays in the SDK's batch until the 5-second
+   * export timer, which races the wait. Each hide flushes whatever has ended
+   * since the last one.
+   */
+  expectSpan(predicate: (s: Span) => boolean, timeoutMs?: number): Promise<Span>;
+}
+
+/**
+ * Capture every span sent to /v1/traces. Must be awaited before page.goto().
+ * An export the interceptor cannot read fails the next expectSpan() rather than
+ * being dropped, since a dropped export looks exactly like a missing span.
+ */
+export async function installOtlpInterceptor(page: Page): Promise<OtlpInterceptor> {
+  const captured: Span[] = [];
+  const exportErrors: string[] = [];
+
+  await page.route(OTLP_ROUTE, async (route) => {
+    const raw = route.request().postData();
+    if (raw === null) {
+      exportErrors.push('an OTLP export request had no readable body');
+    } else {
+      try {
+        captured.push(...parseBody(raw));
+      } catch (error) {
+        exportErrors.push(`an OTLP export body did not parse: ${String(error)}`);
+      }
+    }
+    // Fulfilled even when unreadable, so the SDK does not see a network failure
+    // and retry; the recorded error fails the test instead.
+    await route.fulfill({ status: 200, body: '{}', contentType: 'application/json' });
+  });
+
+  page.on('requestfailed', (request) => {
+    if (new URL(request.url()).pathname === '/v1/traces') {
+      exportErrors.push(`an OTLP export request failed: ${request.failure()?.errorText ?? 'unknown'}`);
+    }
+  });
+
+  const describeCapture = (): string =>
+    `Captured spans: ${JSON.stringify(captured.map((s) => s.name))}`;
+
+  return {
+    async expectSpan(predicate, timeoutMs = DEFAULT_TIMEOUT_MS): Promise<Span> {
+      const deadline = Date.now() + timeoutMs;
+      for (;;) {
+        if (exportErrors.length > 0) {
+          throw new Error(`${exportErrors.join('\n')}\n${describeCapture()}`);
+        }
+        const found = captured.find(predicate);
+        if (found) return found;
+        if (Date.now() >= deadline) {
+          throw new Error(`expectSpan timed out after ${timeoutMs}ms.\n${describeCapture()}`);
+        }
+        await hidePage(page);
+        await page.waitForTimeout(POLL_INTERVAL_MS);
+      }
+    },
+  };
 }

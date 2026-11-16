@@ -1,8 +1,8 @@
-import { test, expect } from '@playwright/test';
-import { installOtlpInterceptor, setupPage, flushSpans } from '../helpers/otlp.js';
+import { test, expect, type Page } from '@playwright/test';
+import { installOtlpInterceptor, setupPage } from '../helpers/otlp.js';
 
 // Prevent real external network calls in every test.
-async function mockExternalFetch(page: Parameters<typeof installOtlpInterceptor>[0]) {
+async function mockExternalFetch(page: Page) {
   await page.route('**/jsonplaceholder.typicode.com/**', (route) =>
     route.fulfill({
       status: 200,
@@ -17,19 +17,15 @@ async function mockExternalFetch(page: Parameters<typeof installOtlpInterceptor>
 test.describe('react-basic — navigation spans', () => {
   test('emits initial route span on page load', async ({ page }) => {
     await setupPage(page);
-    const otlp = installOtlpInterceptor(page);
+    const otlp = await installOtlpInterceptor(page);
 
     await page.goto('/');
-    // React useEffect fires asynchronously after commit. Yield one full event-loop
-    // cycle (rAF → setTimeout) so the initial '/' effect can run and create the span.
-    await page.evaluate(() => new Promise<void>((r) => requestAnimationFrame(() => setTimeout(r, 0))));
-    // Click away so the '/tasks' effect calls clearRouteSpan(), ending the '/' span.
+    // Navigating away ends the '/' span. Both route spans come from effects that
+    // React runs later, so expectSpan keeps flushing until the '/' span arrives.
     await page.click('[data-blindspot-label="nav-tasks"]');
-    // Yield again so the '/tasks' effect fires and ends the '/' span.
-    await page.evaluate(() => new Promise<void>((r) => requestAnimationFrame(() => setTimeout(r, 0))));
-    await flushSpans(page);
+    await page.waitForURL('**/tasks');
 
-    const span = await otlp.waitForSpan(
+    const span = await otlp.expectSpan(
       (s) =>
         s.name === 'navigation' &&
         s.attributes['ux.route.to'] === '/' &&
@@ -41,15 +37,14 @@ test.describe('react-basic — navigation spans', () => {
 
   test('emits user navigation span on route change', async ({ page }) => {
     await setupPage(page);
-    const otlp = installOtlpInterceptor(page);
+    const otlp = await installOtlpInterceptor(page);
 
     await page.goto('/');
     await page.click('[data-blindspot-label="nav-tasks"]');
     // Navigate once more to end the /tasks span.
     await page.click('[data-blindspot-label="nav-about"]');
-    await flushSpans(page);
 
-    const span = await otlp.waitForSpan(
+    const span = await otlp.expectSpan(
       (s) =>
         s.name === 'navigation' &&
         s.attributes['ux.route.from'] === '/' &&
@@ -66,14 +61,13 @@ test.describe('react-basic — navigation spans', () => {
 test.describe('react-basic — interaction spans', () => {
   test('emits click span on interactive element', async ({ page }) => {
     await setupPage(page);
-    const otlp = installOtlpInterceptor(page);
+    const otlp = await installOtlpInterceptor(page);
 
     await page.goto('/tasks');
     // Click the first task checkbox.
     await page.locator('input[type="checkbox"]').first().click();
-    await flushSpans(page);
 
-    const span = await otlp.waitForSpan(
+    const span = await otlp.expectSpan(
       (s) => s.name.startsWith('click') && s.attributes['ux.element.tag'] === 'input',
     );
     expect(span.attributes['ux.interaction.type']).toBe('click');
@@ -81,14 +75,13 @@ test.describe('react-basic — interaction spans', () => {
 
   test('emits form submit span on form submission', async ({ page }) => {
     await setupPage(page);
-    const otlp = installOtlpInterceptor(page);
+    const otlp = await installOtlpInterceptor(page);
 
     await page.goto('/tasks');
     await page.fill('input[type="text"]', 'E2E test task');
     await page.click('button[type="submit"]');
-    await flushSpans(page);
 
-    const span = await otlp.waitForSpan((s) => s.name.startsWith('form.submit'));
+    const span = await otlp.expectSpan((s) => s.name.startsWith('form.submit'));
     expect(span.attributes['ux.form.valid']).toBe(true);
     expect(Number(span.attributes['ux.form.attempts'])).toBeGreaterThanOrEqual(1);
   });
@@ -99,7 +92,7 @@ test.describe('react-basic — interaction spans', () => {
 test.describe('react-basic — network spans', () => {
   test('emits fetch span and injects W3C traceparent header', async ({ page }) => {
     await setupPage(page);
-    const otlp = installOtlpInterceptor(page);
+    const otlp = await installOtlpInterceptor(page);
 
     let capturedTraceparent: string | null = null;
 
@@ -119,9 +112,8 @@ test.describe('react-basic — network spans', () => {
       page.waitForResponse(/^https:\/\/jsonplaceholder\.typicode\.com\//),
       page.click('button.btn-primary'),
     ]);
-    await flushSpans(page);
 
-    const span = await otlp.waitForSpan(
+    const span = await otlp.expectSpan(
       (s) => s.name === 'GET' && String(s.attributes['url.full']).endsWith('/todos/1'),
     );
     expect(span.attributes['http.request.method']).toBe('GET');
@@ -138,16 +130,14 @@ test.describe('react-basic — network spans', () => {
 test.describe('react-basic — error spans', () => {
   test('emits error span on unhandled exception', async ({ page }) => {
     await setupPage(page);
-    const otlp = installOtlpInterceptor(page);
+    const otlp = await installOtlpInterceptor(page);
     await mockExternalFetch(page);
 
     await page.goto('/');
-    // The button uses setTimeout(0) to throw, so wait one tick before flushing.
+    // The button throws from a setTimeout(0); expectSpan flushes until the error span lands.
     await page.click('button.btn-secondary');
-    await page.evaluate(() => new Promise<void>((r) => setTimeout(r, 50)));
-    await flushSpans(page);
 
-    const span = await otlp.waitForSpan((s) => s.name === 'error.unhandled');
+    const span = await otlp.expectSpan((s) => s.name === 'error.unhandled');
     const exc = span.events.find((e) => e.name === 'exception');
     expect(exc).toBeDefined();
     expect(exc!.attributes['exception.type']).toBe('Error');
@@ -168,7 +158,7 @@ test.describe('react-basic — web vitals', () => {
 
   test('records CLS and INP on the route span when the page is hidden', async ({ page }) => {
     await setupPage(page);
-    const otlp = installOtlpInterceptor(page);
+    const otlp = await installOtlpInterceptor(page);
 
     await page.goto('/');
     await page.evaluate(() => new Promise<void>((r) => requestAnimationFrame(() => setTimeout(r, 0))));
@@ -197,9 +187,8 @@ test.describe('react-basic — web vitals', () => {
     await page.click('#slow-interaction');
     await page.evaluate(() => new Promise<void>((r) => requestAnimationFrame(() => setTimeout(r, 0))));
 
-    await flushSpans(page);
 
-    const span = await otlp.waitForSpan(
+    const span = await otlp.expectSpan(
       (s) => s.name === 'navigation' && s.attributes['ux.route.to'] === '/',
     );
     const vitals = span.events.map((e) => e.name);
