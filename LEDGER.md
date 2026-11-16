@@ -195,3 +195,34 @@ dependency, the example and e2e run 7.
 measured, `react-router-dom` is declared as an optional peer with that range in a
 changeset, the docs state it, and every major in the range is tested, as for React (see
 the React 18 job in `ci.yml`).
+
+## L18: The e2e suite is not linted (low)
+
+**Where:** [`e2e/`](e2e), the root ESLint config
+
+ESLint reports every file under `e2e/` as ignored, so `pnpm lint` and CI never check the
+tests or their helpers (an `eslint-disable` comment there was disabling nothing).
+Type-checking does cover them, through the package's `type-check` script.
+
+**Closed when:** the ESLint config includes `e2e/` (with Playwright's recommended rules if
+they earn their place, measured by what they flag on the current suite), and `pnpm lint`
+runs it.
+
+## L19: The React example's dev server can reload the page right after it starts (low)
+
+**Where:** [`examples/react-basic`](examples/react-basic), the Playwright `webServer`
+entries in [`e2e/playwright.config.ts`](e2e/playwright.config.ts)
+
+Locally, Vite sometimes logs `[vite] (client) page reload index.html` within a second of
+starting under Playwright. A test running at that moment loses its page mid-test
+("Execution context was destroyed"). It reproduced in 2 of 5 cold starts, never with the
+server started alone, and never in a CI log, so another process starting alongside it is
+the likely trigger. The example also sets `server.open: true`, so every e2e run tries to
+open a browser tab.
+
+Also seen locally, once in about 135 repeated runs: Firefox received the HTML for `/` and
+requested nothing else, so `page.goto` hit the 20 s test timeout (the retained trace has
+one network entry). It is not yet known whether it shares a cause.
+
+**Closed when:** the trigger is identified and removed (or the e2e run waits until the
+server is idle), and the example's `open` behaviour does not apply under Playwright.
