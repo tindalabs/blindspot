@@ -11,7 +11,7 @@ React integration for [Blindspot](https://github.com/tindalabs/blindspot) — *o
 npm install @tindalabs/blindspot-react @tindalabs/blindspot
 ```
 
-Requires React ≥18. `react-router-dom` is an optional peer (only for `<BlindspotRoutes>`).
+Requires React 18 or 19. `react-router-dom` 6 or 7 is an optional peer, needed only for `<BlindspotRoutes>` from `@tindalabs/blindspot-react/react-router`.
 
 ## Usage
 

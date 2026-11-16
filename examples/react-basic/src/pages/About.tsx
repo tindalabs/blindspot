@@ -14,7 +14,7 @@ export default function About() {
         <h3 style={{ marginBottom: '0.75rem' }}>Stack</h3>
         <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           <li><strong>SDK</strong> → @tindalabs/blindspot-react (this repo)</li>
-          <li><strong>Router</strong> → React Router v6 + BlindspotRoutes</li>
+          <li><strong>Router</strong> → React Router v7 + BlindspotRoutes</li>
           <li><strong>Collector</strong> → OpenTelemetry Collector Contrib (localhost:4318)</li>
           <li><strong>Storage</strong> → Grafana Tempo</li>
           <li><strong>Visualization</strong> → Grafana (localhost:3100)</li>

@@ -28,7 +28,7 @@ features:
 
   - icon: ⚡
     title: Framework Integrations
-    details: Drop-in integrations for React (React Router v6, TanStack Router), Vue 3 (Vue Router), Next.js (App Router + Pages Router, RSC-safe), and Svelte / SvelteKit.
+    details: Drop-in integrations for React (React Router v6 and v7, TanStack Router), Vue 3 (Vue Router), Next.js (App Router + Pages Router, RSC-safe), and Svelte / SvelteKit.
 ---
 
 <div style="text-align:center;margin-top:3rem;opacity:0.6;font-size:0.9rem">

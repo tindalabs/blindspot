@@ -131,7 +131,7 @@ import { BlindspotProvider } from '@tindalabs/blindspot-react'
 </BlindspotProvider>
 ```
 
-### Route tracing (React Router v6)
+### Route tracing (React Router v6 and v7)
 
 Drop-in replacement for `<Routes>` that creates a root span on every navigation.
 
