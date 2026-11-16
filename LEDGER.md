@@ -201,7 +201,10 @@ Locally, Vite sometimes logs `[vite] (client) page reload index.html` within a s
 starting under Playwright. A test running at that moment loses its page mid-test
 ("Execution context was destroyed"). It reproduced in 2 of 5 cold starts, never with the
 server started alone, and never in a CI log, so another process starting alongside it is
-the likely trigger. The example also sets `server.open: true`, so every e2e run tries to
+the likely trigger. A lead, not yet confirmed: the one failure seen while testing React
+Router 6 was on the first start of a fresh worktree, with no Vite dependency cache, and
+eight warm runs after it passed; the dependency optimizer reloads the page after its first
+pass. The example also sets `server.open: true`, so every e2e run tries to
 open a browser tab.
 
 Also seen locally, once in about 135 repeated runs: Firefox received the HTML for `/` and
@@ -210,3 +213,18 @@ one network entry). It is not yet known whether it shares a cause.
 
 **Closed when:** the trigger is identified and removed (or the e2e run waits until the
 server is idle), and the example's `open` behaviour does not apply under Playwright.
+
+## L20: Release PRs never get the required checks (medium)
+
+**Where:** the "Create Release Pull Request or Publish" step in
+[`release.yml`](.github/workflows/release.yml), the `main` ruleset's required checks
+
+`changesets/action` pushes the release branch with `GITHUB_TOKEN`, and GitHub starts no
+workflows for pushes made with that token. The ruleset requires `ci`, both `e2e` jobs
+and `react 18`, so every Version Packages PR sits blocked with an empty check list. PR #76 was unblocked by closing and reopening it, which a person does and so
+does trigger `pull_request`; that has to be repeated after every push the action makes.
+
+**Closed when:** the action pushes with a token that triggers workflows (a GitHub App
+installation token, which is preferable to a personal token because it is scoped to the
+repo and not tied to a person), a Version Packages PR gets its checks without a reopen,
+and the change lands with or after L9, since action v2 renames the token input.
