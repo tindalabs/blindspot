@@ -43,11 +43,13 @@ calls are no-ops).
 ## Route tracing — React Router v6
 
 `<BlindspotRoutes>` is a drop-in replacement for `<Routes>`. It creates a root
-span on every navigation and ends the previous one.
+span on every navigation and ends the previous one. It is exported from the
+`/react-router` subpath, so apps that do not use React Router never load it.
 
 ```tsx
 import { BrowserRouter, Route } from 'react-router-dom'
-import { BlindspotProvider, BlindspotRoutes } from '@tindalabs/blindspot-react'
+import { BlindspotProvider } from '@tindalabs/blindspot-react'
+import { BlindspotRoutes } from '@tindalabs/blindspot-react/react-router'
 
 function App() {
   return (
@@ -62,12 +64,6 @@ function App() {
     </BlindspotProvider>
   )
 }
-```
-
-Or use the dedicated subpath import:
-
-```tsx
-import { BlindspotRoutes } from '@tindalabs/blindspot-react/react-router'
 ```
 
 ## Route tracing — TanStack Router and others

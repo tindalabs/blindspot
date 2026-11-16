@@ -136,7 +136,7 @@ import { BlindspotProvider } from '@tindalabs/blindspot-react'
 Drop-in replacement for `<Routes>` that creates a root span on every navigation.
 
 ```tsx
-import { BlindspotRoutes } from '@tindalabs/blindspot-react'
+import { BlindspotRoutes } from '@tindalabs/blindspot-react/react-router'
 
 <BlindspotRoutes>
   <Route path="/checkout" element={<Checkout />} />

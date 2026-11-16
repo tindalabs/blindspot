@@ -28,7 +28,7 @@ import { BlindspotProvider } from '@tindalabs/blindspot-react'
 Trace navigations with a drop-in replacement for `<Routes>` (creates a root span per navigation):
 
 ```tsx
-import { BlindspotRoutes } from '@tindalabs/blindspot-react'
+import { BlindspotRoutes } from '@tindalabs/blindspot-react/react-router'
 
 <BlindspotRoutes>
   <Route path="/checkout" element={<Checkout />} />
